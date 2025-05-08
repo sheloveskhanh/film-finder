@@ -1,0 +1,34 @@
+/* Simple hover info box */
+.info-box {
+  position: absolute;
+  display: none;
+  pointer-events: none;
+  z-index: 2000;
+
+  width: 240px;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.info-box h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #222;
+}
+
+.info-box p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #444;
+}
+
+.info-box p strong {
+  color: #333;
+}
+.info-box p a {
+  color: #007bff;
+  text-decoration: none;
+}

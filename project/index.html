@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="title">Movie App</title>
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/modal.css" />
+  <link rel="stylesheet" href="assets/css/infobox.css">
+
+</head>
+<body>
+  <header>
+    <h1 data-i18n="header">Movie Explorer</h1>
+    <select id="language-switch">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </header>
+  
+  <section class="search-section">
+      <input id="search-input" type="text" placeholder="Search for movies..." data-i18n-placeholder="searchPlaceholder">
+      <button id="search-button" data-i18n="search">Search</button>
+    </section>
+    
+    <h3>Clicks on the movie's name for more information</h3>
+
+    <section id="results"></section>
+    
+
+  <section>
+    <h2 data-i18n="favorites">Favorites</h2>
+    <ul id="favorites-list"></ul>
+  </section>
+
+  <!-- Modal markup -->
+  <div id="movie-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script src="assets/components/lang.js"></script>
+  <script src="assets/components/favorites.js"></script>
+  <script src="assets/components/modal.js"></script>
+  <script src="assets/components/infobox.js"></script>
+
+  <script src="assets/components/main.js"></script>
+</body>
+</html>
