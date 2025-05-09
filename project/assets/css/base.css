@@ -31,46 +31,80 @@ header {
   border-radius: 4px;
   cursor: pointer;
 }
-#results .movie {
+#search-button:hover {
+  background: #0056b3;
+}
+
+#suggestions {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #f7f7f7;
+  color: #ebebf0;
+  border: 1px solid #5f6368;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 6px rgba(236, 235, 235, 0.28);
+  list-style: none;
+}
+
+#results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Individual result card */
+.result-card {
   background: #fff;
   border: 1px solid #ddd;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  border-radius: 4px;
+  flex-direction: column;
 }
-#results .movie span {
+
+/* Poster image at top */
+.result-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Info & button area */
+.result-info {
+  padding: 0.75rem;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-#results .add-fav {
-  padding: 0.25rem 0.5rem;
+
+/* Title & year */
+.result-info .title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+/* Add to favorites button */
+.result-info .add-fav {
+  align-self: flex-start;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
   border: none;
   background: #28a745;
   color: #fff;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.2s;
 }
-ul#favorites-list {
-  list-style: none;
-  margin-top: 0.5rem;
-}
-ul#favorites-list li {
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  border-radius: 4px;
-}
-ul#favorites-list .remove-fav {
-  border: none;
-  background: #dc3545;
-  color: #fff;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
+.result-info .add-fav:hover {
+  background: #218838;
 }

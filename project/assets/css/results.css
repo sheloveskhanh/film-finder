@@ -1,0 +1,63 @@
+/* assets/css/results.css */
+
+/* Grid container */
+#results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Individual card, full height */
+.result-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Poster: fixed height so all cards match */
+.result-card img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+/* Info area fills remaining space */
+.result-info {
+  flex: 1;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Title text */
+.result-info .title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Add‐to‐favorites button */
+.result-info .add-fav {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border: none;
+  background: #28a745;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.result-info .add-fav:hover {
+  background: #218838;
+}

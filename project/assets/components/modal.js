@@ -3,19 +3,39 @@ const MovieModal = (function() {
   const $modal     = $('#movie-modal');
   const $container = $modal.find('.modal-content');
 
+  // Stops any playing YouTube video by resetting the iframe src
+  function stopVideo() {
+    $container.find('iframe').each(function() {
+      const $iframe = $(this);
+      $iframe.attr('src', $iframe.attr('src'));
+    });
+  }
+
   function init() {
-    $container.off('click', '.close')
-              .on('click', '.close', () => $modal.hide());
-    $modal.off('click', onOutside).on('click', onOutside);
+    // Close on “×” click
+    $container
+      .off('click', '.close')
+      .on('click', '.close', () => {
+        stopVideo();
+        $modal.hide();
+      });
+
+    // Close when clicking outside the content box
+    $modal
+      .off('click', onOutsideClick)
+      .on('click', onOutsideClick);
   }
 
-  function onOutside(e) {
-    if (e.target === $modal[0]) $modal.hide();
+  function onOutsideClick(e) {
+    if (e.target === $modal[0]) {
+      stopVideo();
+      $modal.hide();
+    }
   }
 
-  // Now accepts trailerId (string|null) and embeddable (bool)
+  // show(movieData, trailerId: string|null, embeddable: bool)
   function show(movie, trailerId, embeddable) {
-    // build the trailer (or fallback) section
+    // Build the trailer section (or fallback link/message)
     let trailerSection;
     if (trailerId && embeddable) {
       trailerSection = `
@@ -42,6 +62,7 @@ const MovieModal = (function() {
         </div>`;
     }
 
+    // Compose full modal HTML
     const html = `
       <div class="modal-header">
         <span class="close">&times;</span>
@@ -54,11 +75,13 @@ const MovieModal = (function() {
           <p><strong>Actors:</strong> ${movie.Actors}</p>
           <p><strong>Release Date:</strong> ${movie.Released}</p>
           <p><strong>IMDb Rating:</strong> ${movie.imdbRating}</p>
+          <p><strong>Description:</strong> ${movie.Plot}</p>
         </div>
       </div>
       ${trailerSection}
     `;
 
+    // Inject and show
     $container.html(html);
     init();
     $modal.show();
