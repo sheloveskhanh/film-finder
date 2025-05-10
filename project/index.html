@@ -1,57 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="title">Movie App</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="title">Movie Explorer</title>
+
+  <!-- Base & Component Styles -->
   <link rel="stylesheet" href="assets/css/base.css" />
-  <link rel="stylesheet" href="assets/css/modal.css" />
-  <link rel="stylesheet" href="assets/css/infobox.css">
+  <link rel="stylesheet" href="assets/css/banner.css" />
+  <link rel="stylesheet" href="assets/css/navbar.css" />
+  <link rel="stylesheet" href="assets/css/search.css" />
   <link rel="stylesheet" href="assets/css/suggestions.css" />
-  <link rel="stylesheet" href="assets/css/favorites.css">
-  <link rel="stylesheet" href="assets/css/results.css">
-
-
+  <link rel="stylesheet" href="assets/css/results.css" />
+  <link rel="stylesheet" href="assets/css/favorites.css" />
+  <link rel="stylesheet" href="assets/css/modal.css" />
+  <link rel="stylesheet" href="assets/css/infobox.css" />
+  <link rel="stylesheet" href="assets/css/popular.css" />
 </head>
 <body>
-  <header>
-    <h1 data-i18n="header">Movie Explorer</h1>
-    <select id="language-switch">
-      <option value="en">English</option>
-      <option value="es">Español</option>
-    </select>
-  </header>
-  
-  <section class="search-section">
-      <input id="search-input" type="text" placeholder="Search for movies..." data-i18n-placeholder="searchPlaceholder">
-      <button id="search-button" data-i18n="search">Search</button>
-    </section>
-    
-    <h3>Clicks on the movie's name for more information</h3>
 
-    <section id="results"></section>
-    
-
-  <section>
-    <h2 data-i18n="favorites">Favorites</h2>
-    <div id="favorites-list" class="favorites-grid"></div>
-  </section>
-
-  <div id="movie-modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <div id="modal-body"></div>
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <h1 data-i18n="title">Movie App</h1>
     </div>
+    <div class="nav-center">
+      <!-- Genre Dropdown -->
+      <div class="genre-dropdown">
+        <button id="genre-button">Genre ▾</button>
+        <ul id="genre-list" class="dropdown-content"></ul>
+      </div>
+    </div>
+    <div class="nav-right">
+      <!-- Language Switcher -->
+      <select id="language-switch">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+      </select>
+      <!-- Favorites Dropdown -->
+      <div class="favorites-dropdown">
+        <button id="favorites-button">★</button>
+        <ul id="favorites-list" class="dropdown-content"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h2 data-i18n="heroTitle">Welcome.</h2>
+      <p data-i18n="heroSubtitle">Millions of movies, TV shows and people to discover. Explore now.</p>
+    </div>
+  </header>
+
+    <!-- Search Bar -->
+  <div class="search-section">
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Search for movies..."
+          data-i18n-placeholder="searchPlaceholder"
+        />
+        <button id="search-button" data-i18n="search">Search</button>
+      </div>
+  <section class="popular-section">
+  <h2>What's Popular</h2>
+  <div class="popular-tabs" id="popular-tabs">
+    <button data-cat="streaming" class="active">Streaming</button>
+    <button data-cat="on_tv">On TV</button>
+    <button data-cat="for_rent">For Rent</button>
+    <button data-cat="in_theaters">In Theaters</button>
+  </div>
+  <div class="popular-list" id="popular-list"></div>
+</section>
+
+    <!-- Suggestions Dropdown -->
+    <ul id="suggestions" class="suggestions"></ul>
+
+    <!-- Results Grid -->
+    <section id="results"></section>
   </div>
 
+  <!-- Info Modal -->
+  <div id="movie-modal" class="modal">
+    <div class="modal-content"></div>
+  </div>
+
+  <!-- Core Libraries -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+  <!-- Component Scripts -->
   <script src="assets/components/lang.js"></script>
   <script src="assets/components/favorites.js"></script>
   <script src="assets/components/modal.js"></script>
   <script src="assets/components/infobox.js"></script>
 
+  <!-- Main Application Logic -->
   <script src="assets/components/main.js"></script>
 </body>
 </html>

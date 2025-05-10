@@ -1,110 +1,58 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* assets/css/base.css */
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+}
+
 body {
   font-family: Arial, sans-serif;
-  padding: 1rem;
-  max-width: 800px;
+  background: #f0ebeb;
+}
+
+/* Wrapper for main content to center text section only */
+.main-container {
+  max-width: 1100px;
   margin: auto;
-  background: #f9f9f9;
 }
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
+
+/* Search section layout */
 .search-section {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
+
 #search-input {
   flex: 1;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 1rem;
 }
+
 #search-button {
   padding: 0.5rem 1rem;
   border: none;
   background: #007bff;
   color: #fff;
   border-radius: 4px;
+  font-size: 1rem;
   cursor: pointer;
 }
-#search-button:hover {
-  background: #0056b3;
-}
 
-#suggestions {
-  position: absolute;
-  top: calc(100% + 2px);
-  left: 0;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
-  background: #f7f7f7;
-  color: #ebebf0;
-  border: 1px solid #5f6368;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 6px rgba(236, 235, 235, 0.28);
-  list-style: none;
-}
-
-#results {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-/* Individual result card */
-.result-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Poster image at top */
-.result-card img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Info & button area */
-.result-info {
-  padding: 0.75rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Title & year */
-.result-info .title {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #333;
+/* Section headings */
+h1, h2 {
   margin-bottom: 0.5rem;
 }
 
-/* Add to favorites button */
-.result-info .add-fav {
-  align-self: flex-start;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.85rem;
-  border: none;
-  background: #28a745;
-  color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s;
+section {
+  margin-bottom: 2rem;
 }
-.result-info .add-fav:hover {
-  background: #218838;
+
+/* Utility classes */
+.hidden {
+  display: none !important;
 }

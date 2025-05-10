@@ -1,0 +1,69 @@
+
+.hero {
+  position: relative;
+  height: 320px;
+  background-image: url('https://c4.wallpaperflare.com/wallpaper/862/449/162/jack-reacher-star-wars-interstellar-movie-john-wick-wallpaper-preview.jpg');
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Semi‐transparent overlay */
+.hero‐overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(13,37,63,0.75);
+}
+
+/* Centered content layer */
+.hero‐content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: #fff;
+  max-width: 700px;
+  padding: 0 1rem;
+}
+
+/* Heading & subtitle */
+.hero‐content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+.hero‐content p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.85;
+}
+
+/* Move your pill‐shaped search into the hero */
+.search‐section {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+.search‐section input#search-input {
+  border-radius: 999px 0 0 999px;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  width: 60%;
+  max-width: 500px;
+  outline: none;
+}
+.search‐section button#search-button {
+  border-radius: 0 999px 999px 0;
+  border: none;
+  padding: 0 1.5rem;
+  background: #01b4e4;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+.search‐section button#search-button:hover {
+  background: #0290b7;
+}

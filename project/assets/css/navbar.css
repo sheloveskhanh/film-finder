@@ -1,0 +1,96 @@
+/* assets/css/navbar.css */
+
+/* Top bar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0d253f;
+  color: #fff;
+  padding: 0.5rem 1rem;
+}
+.navbar .nav-left h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.navbar .nav-right select {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.9rem;
+}
+
+/* Genre scrolling bar */
+.genres-container {
+  background: #01b4e4;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 0.5rem 0;
+}
+#nav-genres {
+  display: inline-flex;
+  list-style: none;
+  margin: 0;
+  padding: 0 1rem;
+}
+#nav-genres li {
+  margin-right: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  background: #01b4e4;
+  color: #fff;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s, color 0.2s;
+}
+#nav-genres li:hover,
+#nav-genres li.active {
+  background: #90cea1;
+  color: #000;
+}
+.favorites-dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: 1rem;
+}
+#favorites-button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  min-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+}
+.dropdown-content li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+.dropdown-content li:last-child {
+  border-bottom: none;
+}
+.dropdown-content li .remove-fav {
+  background: transparent;
+  border: none;
+  color: #c00;
+  font-size: 1.2rem;
+  cursor: pointer;
+}

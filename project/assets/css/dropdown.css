@@ -1,0 +1,53 @@
+/* assets/css/navbar.css (or dropdown.css) */
+
+/* Container to position the dropdown */
+.genre-dropdown {
+  position: relative;
+  display: inline-block;
+  margin: 0.5rem 1rem;
+}
+
+/* The button */
+#genre-button {
+  background: #01b4e4;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Hidden by default */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #fff;
+  min-width: 160px;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  z-index: 100;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each genre item */
+.dropdown-content li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.dropdown-content li:hover {
+  background: #f0f0f0;
+}
+
+/* Show on hover of the container */
+.genre-dropdown:hover .dropdown-content {
+  display: block;
+}
