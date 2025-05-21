@@ -80,3 +80,18 @@
 .search-section button#search-button:hover {
   background: #0290b7;
 }
+
+.banner-title,
+.banner-sub,
+.btn-cta {
+  position: relative; 
+  z-index: 1;
+}
+
+.banner-title {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+

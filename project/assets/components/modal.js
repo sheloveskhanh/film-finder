@@ -1,9 +1,7 @@
-// assets/js/components/modal.js
 const MovieModal = (function() {
   const $modal     = $('#movie-modal');
   const $container = $modal.find('.modal-content');
 
-  // Stops any playing YouTube video by resetting the iframe src
   function stopVideo() {
     $container.find('iframe').each(function() {
       const $iframe = $(this);
@@ -12,7 +10,6 @@ const MovieModal = (function() {
   }
 
   function init() {
-    // Close on “×” click
     $container
       .off('click', '.close')
       .on('click', '.close', () => {
@@ -20,7 +17,6 @@ const MovieModal = (function() {
         $modal.hide();
       });
 
-    // Close when clicking outside the content box
     $modal
       .off('click', onOutsideClick)
       .on('click', onOutsideClick);
@@ -33,9 +29,7 @@ const MovieModal = (function() {
     }
   }
 
-  // show(movieData, trailerId: string|null, embeddable: bool)
   function show(movie, trailerId, embeddable) {
-    // Build the trailer section (or fallback link/message)
     let trailerSection;
     if (trailerId && embeddable) {
       trailerSection = `
@@ -62,7 +56,6 @@ const MovieModal = (function() {
         </div>`;
     }
 
-    // Compose full modal HTML
     const html = `
       <div class="modal-header">
         <span class="close">&times;</span>
@@ -81,7 +74,6 @@ const MovieModal = (function() {
       ${trailerSection}
     `;
 
-    // Inject and show
     $container.html(html);
     init();
     $modal.show();

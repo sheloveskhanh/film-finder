@@ -1,0 +1,126 @@
+.filters {
+  display: grid;
+  /* force exactly 5 columns, each at least 180px but sharing the space equally */
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem auto;
+  max-width: 1000px;
+  padding: 0 1rem;
+}
+
+
+.filter-item {
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.filter-item label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+.filter-item input[type="number"],
+.filter-item button {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.75rem;
+  background: #fff;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.filter-item input[type="number"]:focus,
+.filter-item button:focus,
+.filter-item button:hover {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.3);
+  border-color: #1e90ff;
+}
+
+.filter-item span {
+  margin: 0.5rem 0;
+  font-weight: 600;
+  color: #555;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  list-style: none;
+  padding: 0.25rem 0;
+  margin: 0;
+  display: none;
+  max-height: 14rem;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 180px;
+  width: auto;
+}
+
+.dropdown-menu li {
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.dropdown-menu li:hover,
+.dropdown-menu li.active {
+  background: #f0f8ff;
+}
+
+html {
+  overflow-y: scroll;
+}
+
+.filters .filter-item:nth-child(1) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.filters .filter-item:nth-child(1) label {
+  flex-basis: 100%;
+  text-align: center;
+}
+.filters .filter-item:nth-child(1) input[type="number"] {
+  flex: 1;
+  margin: 0 0.5rem;
+}
+
+/* Always show vertical scrollbar to prevent layout shift */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+#clear-filters {
+  width: 100%;
+  max-width: 180px;
+  height: 2.5rem;
+  padding: 0 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.75rem;
+  background: #f8f8f8;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#clear-filters:hover {
+  background: #e0e0e0;
+}

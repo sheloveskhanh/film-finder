@@ -51,3 +51,63 @@
 .genre-dropdown:hover .dropdown-content {
   display: block;
 }
+
+
+/* container for both search + filters */
+.search-section {
+  max-width: 800px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+/* keep your existing form styles ... */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* style the selects & button uniformly */
+.filters select,
+.filters .genre-dropdown > button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  background: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.filters select:focus,
+.filters .genre-dropdown > button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.3);
+}
+
+/* the custom genre <ul> */
+.genre-dropdown {
+  position: relative;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: max-content;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.5rem 0;
+  list-style: none;
+  display: none;            
+  z-index: 10;
+}
+.dropdown-menu li {
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+.dropdown-menu li:hover {
+  background: #f0f0f0;
+}

@@ -17,10 +17,10 @@
   <link rel="stylesheet" href="assets/css/modal.css" />
   <link rel="stylesheet" href="assets/css/infobox.css" />
   <link rel="stylesheet" href="assets/css/popular.css" />
+  <link rel="stylesheet" href="assets/css/filter.css" />
 </head>
 
 <body>
-
   <!-- Top Navigation Bar -->
   <nav class="navbar">
     <div class="nav-left">
@@ -44,15 +44,60 @@
   <header class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <p class="hero-tagline">Explore movies like never before</p>
+      <div class="banner">
+        <h1 class="banner-title">Find Your Next Movie Obsession</h1>
+        <p class="banner-sub">
+          From indie gems to blockbuster hits—find the stories that move you
+        </p>
+      </div>
     </div>
   </header>
 
-  <!-- Search Bar -->
+  <!-- Search Bar + Filters -->
   <div class="search-section">
     <input id="search-input" type="text" placeholder="Search for movies..." data-i18n-placeholder="searchPlaceholder" />
     <button id="search-button" data-i18n="search">Search</button>
   </div>
+
+  <div class="filters">
+    <!-- 1) Year Range -->
+    <div class="filter-item">
+      <label for="year-from">Year Range</label>
+      <input type="number" id="year-from" placeholder="From" min="1900" max="2099" />
+      <span>–</span>
+      <input type="number" id="year-to" placeholder="To" min="1900" max="2099" />
+    </div>
+
+    <!-- 2) Sort by -->
+    <div class="filter-item">
+      <label>Sort by</label>
+      <button type="button" id="sort-button">Sort by ▾</button>
+      <ul id="sort-list" class="dropdown-menu"></ul>
+    </div>
+
+    <!-- 3) Country -->
+    <div class="filter-item">
+      <label>Country</label>
+      <button type="button" id="country-button">Country ▾</button>
+      <ul id="country-list" class="dropdown-menu"></ul>
+    </div>
+
+    <!-- 4) Genre -->
+    <div class="filter-item">
+      <label>Genre</label>
+      <button type="button" id="genre-button-2">Genre ▾</button>
+      <ul id="genre-list-2" class="dropdown-menu"></ul>
+    </div>
+
+    <!-- 5) Clear Filters -->
+    <div class="filter-item">
+      <label>&nbsp;</label>
+      <button type="button" id="clear-filters">Clear Filters</button>
+    </div>
+  </div>
+
+
+  <!-- Popular Section -->
   <section class="popular-section">
     <h2>What's Popular</h2>
     <div class="popular-tabs" id="popular-tabs">
@@ -69,7 +114,6 @@
 
   <!-- Results Grid -->
   <section id="results"></section>
-  </div>
 
   <!-- Info Modal -->
   <div id="movie-modal" class="modal">
