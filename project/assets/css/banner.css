@@ -1,7 +1,9 @@
+/* assets/css/banner.css */
 
 .hero {
   position: relative;
   height: 320px;
+  /* background-image: none;  <-- you can disable the image here if you like */
   background-image: url('https://c4.wallpaperflare.com/wallpaper/862/449/162/jack-reacher-star-wars-interstellar-movie-john-wick-wallpaper-preview.jpg');
   background-position: center;
   display: flex;
@@ -10,16 +12,17 @@
   margin-bottom: 1.5rem;
 }
 
-/* Semi‐transparent overlay */
-.hero‐overlay {
+.hero-overlay {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(13,37,63,0.75);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(45, 61, 79, 0.75);
+  z-index: 0;
 }
 
-/* Centered content layer */
-.hero‐content {
+.hero-content {
   position: relative;
   z-index: 1;
   text-align: center;
@@ -28,24 +31,32 @@
   padding: 0 1rem;
 }
 
-/* Heading & subtitle */
-.hero‐content h2 {
+.hero-content h2 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
 }
-.hero‐content p {
+
+.hero-content p {
   font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-  opacity: 0.85;
+  margin-bottom: 1rem;
 }
 
-/* Move your pill‐shaped search into the hero */
-.search‐section {
+/* Your bold white tagline */
+.hero-content .hero-tagline {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 0.5rem 0 1rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Search bar inside the banner */
+.search-section {
   display: flex;
   justify-content: center;
   gap: 0;
 }
-.search‐section input#search-input {
+
+.search-section input#search-input {
   border-radius: 999px 0 0 999px;
   border: none;
   padding: 0.75rem 1rem;
@@ -54,16 +65,18 @@
   max-width: 500px;
   outline: none;
 }
-.search‐section button#search-button {
+
+.search-section button#search-button {
   border-radius: 0 999px 999px 0;
   border: none;
   padding: 0 1.5rem;
   background: #01b4e4;
-  color: white;
+  color: #fff;
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.2s;
 }
-.search‐section button#search-button:hover {
+
+.search-section button#search-button:hover {
   background: #0290b7;
 }
