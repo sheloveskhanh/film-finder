@@ -1,6 +1,4 @@
-/* assets/css/navbar.css */
 
-/* Top bar */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -20,7 +18,6 @@
   font-size: 0.9rem;
 }
 
-/* Genre scrolling bar */
 .genres-container {
   background: #01b4e4;
   overflow-x: auto;

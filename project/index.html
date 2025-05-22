@@ -21,18 +21,15 @@
 </head>
 
 <body>
-  <!-- Top Navigation Bar -->
   <nav class="navbar">
     <div class="nav-left">
       <h1 data-i18n="title">Movie App</h1>
     </div>
     <div class="nav-right">
-      <!-- Language Switcher -->
       <select id="language-switch">
         <option value="en">English</option>
         <option value="es">Español</option>
       </select>
-      <!-- Favorites Dropdown -->
       <div class="favorites-dropdown">
         <button id="favorites-button">★</button>
         <ul id="favorites-list" class="dropdown-content"></ul>
@@ -40,7 +37,6 @@
     </div>
   </nav>
 
-  <!-- Hero Banner -->
   <header class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -53,14 +49,12 @@
     </div>
   </header>
 
-  <!-- Search Bar + Filters -->
   <div class="search-section">
     <input id="search-input" type="text" placeholder="Search for movies..." data-i18n-placeholder="searchPlaceholder" />
     <button id="search-button" data-i18n="search">Search</button>
   </div>
 
   <div class="filters">
-    <!-- 1) Year Range -->
     <div class="filter-item">
       <label for="year-from">Year Range</label>
       <input type="number" id="year-from" placeholder="From" min="1900" max="2099" />
@@ -68,68 +62,60 @@
       <input type="number" id="year-to" placeholder="To" min="1900" max="2099" />
     </div>
 
-    <!-- 2) Sort by -->
     <div class="filter-item">
       <label>Sort by</label>
       <button type="button" id="sort-button">Sort by ▾</button>
       <ul id="sort-list" class="dropdown-menu"></ul>
     </div>
 
-    <!-- 3) Country -->
     <div class="filter-item">
       <label>Country</label>
       <button type="button" id="country-button">Country ▾</button>
       <ul id="country-list" class="dropdown-menu"></ul>
     </div>
 
-    <!-- 4) Genre -->
     <div class="filter-item">
       <label>Genre</label>
       <button type="button" id="genre-button-2">Genre ▾</button>
       <ul id="genre-list-2" class="dropdown-menu"></ul>
     </div>
 
-    <!-- 5) Clear Filters -->
     <div class="filter-item">
       <label>&nbsp;</label>
       <button type="button" id="clear-filters">Clear Filters</button>
     </div>
   </div>
 
-
-  <!-- Popular Section -->
-  <section class="popular-section">
-    <h2>What's Popular</h2>
+  <section class="popular-section" id="popular-section">
+    <h2>Browse</h2>
     <div class="popular-tabs" id="popular-tabs">
-      <button data-cat="streaming" class="active">Streaming</button>
-      <button data-cat="on_tv">On TV</button>
-      <button data-cat="for_rent">For Rent</button>
-      <button data-cat="in_theaters">In Theaters</button>
+      <button data-cat="top_rated" class="active">Top Movies</button>
+      <button data-cat="upcoming">Incoming</button>
+      <button data-cat="popular">Popular All Time</button>
+      <button data-cat="now_playing">Now Playing</button>
     </div>
-    <div class="popular-list" id="popular-list"></div>
+
+    <div class="popular-carousel">
+      <button id="popular-prev" class="carousel-nav">‹</button>
+      <div class="popular-list" id="popular-list"></div>
+      <button id="popular-next" class="carousel-nav">›</button> 
+    </div>
   </section>
 
-  <!-- Suggestions Dropdown -->
   <ul id="suggestions" class="suggestions"></ul>
 
-  <!-- Results Grid -->
   <section id="results"></section>
 
-  <!-- Info Modal -->
   <div id="movie-modal" class="modal">
     <div class="modal-content"></div>
   </div>
 
-  <!-- Core Libraries -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- Component Scripts -->
   <script src="assets/components/lang.js"></script>
   <script src="assets/components/favorites.js"></script>
   <script src="assets/components/modal.js"></script>
   <script src="assets/components/infobox.js"></script>
-
-  <!-- Main Application Logic -->
   <script src="assets/components/main.js"></script>
 </body>
 

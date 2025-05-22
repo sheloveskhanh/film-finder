@@ -1,4 +1,6 @@
+/* assets/css/results.css */
 
+/* Grid container */
 #results {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -6,7 +8,7 @@
   margin-top: 1rem;
 }
 
-/* Individual card, full height */
+
 .result-card {
   background: #fff;
   border: 1px solid #ddd;
@@ -14,27 +16,38 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;                
   overflow: hidden;
+  position: relative;          
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Poster: fixed height so all cards match */
+.result-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+}
+
 .result-card img {
   width: 100%;
   height: 260px;
   object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
-/* Info area fills remaining space */
+.result-card:hover img {
+  transform: scale(1.05);
+}
+
 .result-info {
   flex: 1;
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+  z-index: 3;                  
 }
 
-/* Title text */
 .result-info .title {
   margin: 0;
   font-size: 1rem;
@@ -43,7 +56,6 @@
   color: #333;
 }
 
-/* Add‐to‐favorites button */
 .result-info .add-fav {
   align-self: flex-start;
   margin-top: 0.5rem;
@@ -56,8 +68,82 @@
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .result-info .add-fav:hover {
   background: #218838;
 }
 
+.result-info .add-fav:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
 
+.result-card .card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 260px;              
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 2;
+}
+
+/* Show overlay on hover */
+.result-card:hover .card-overlay {
+  opacity: 1;
+}
+
+/* Info icon inside overlay */
+.card-overlay .info-icon {
+  font-size: 3rem;
+  color: #fff;
+  text-shadow: 0 0 6px rgba(0,0,0,0.7);
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+/* Pulse icon on hover */
+.result-card:hover .card-overlay .info-icon {
+  transform: scale(1.3) rotate(10deg);
+}
+
+.pop-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.pop-card .card-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.pop-card:hover .card-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pop-card .info-icon {
+  font-size: 2.5rem;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.pop-card:hover .info-icon {
+  transform: scale(1.2);
+}

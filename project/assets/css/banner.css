@@ -1,9 +1,7 @@
-/* assets/css/banner.css */
 
 .hero {
   position: relative;
   height: 320px;
-  /* background-image: none;  <-- you can disable the image here if you like */
   background-image: url('https://c4.wallpaperflare.com/wallpaper/862/449/162/jack-reacher-star-wars-interstellar-movie-john-wick-wallpaper-preview.jpg');
   background-position: center;
   display: flex;
@@ -41,7 +39,6 @@
   margin-bottom: 1rem;
 }
 
-/* Your bold white tagline */
 .hero-content .hero-tagline {
   font-size: 1.4rem;
   font-weight: bold;
@@ -49,7 +46,6 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-/* Search bar inside the banner */
 .search-section {
   display: flex;
   justify-content: center;

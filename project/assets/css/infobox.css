@@ -30,7 +30,6 @@
   color: #000;
 }
 
-/* small arrow at top */
 .info-box::before {
   content: '';
   position: absolute;
