@@ -1,6 +1,4 @@
-/* assets/css/results.css */
 
-/* Grid container */
 #results {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -94,12 +92,10 @@
   z-index: 2;
 }
 
-/* Show overlay on hover */
 .result-card:hover .card-overlay {
   opacity: 1;
 }
 
-/* Info icon inside overlay */
 .card-overlay .info-icon {
   font-size: 3rem;
   color: #fff;

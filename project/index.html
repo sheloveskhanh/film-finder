@@ -29,7 +29,10 @@
       <select id="language-switch">
         <option value="en">English</option>
         <option value="es">Español</option>
+        <option value="fr">French</option>
+        <option value="de">Deutsch</option>
       </select>
+
       <div class="favorites-dropdown">
         <button id="favorites-button">★</button>
         <ul id="favorites-list" class="dropdown-content"></ul>
@@ -41,8 +44,8 @@
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <div class="banner">
-        <h1 class="banner-title">Find Your Next Movie Obsession</h1>
-        <p class="banner-sub">
+        <h1 class="banner-title" data-i18n="bannerTitle">Find Your Next Movie Obsession</h1>
+        <p class="banner-sub" data-i18n="bannerSub">
           From indie gems to blockbuster hits—find the stories that move you
         </p>
       </div>
@@ -88,12 +91,7 @@
 
   <section class="popular-section" id="popular-section">
     <h2>Browse</h2>
-    <div class="popular-tabs" id="popular-tabs">
-      <button data-cat="top_rated" class="active">Top Movies</button>
-      <button data-cat="upcoming">Incoming</button>
-      <button data-cat="popular">Popular All Time</button>
-      <button data-cat="now_playing">Now Playing</button>
-    </div>
+    <div class="popular-tabs" id="popular-tabs"></div>
 
     <div class="popular-carousel">
       <button id="popular-prev" class="carousel-nav">‹</button>
@@ -116,6 +114,7 @@
   <script src="assets/components/favorites.js"></script>
   <script src="assets/components/modal.js"></script>
   <script src="assets/components/infobox.js"></script>
+
   <script src="assets/components/main.js"></script>
 </body>
 
