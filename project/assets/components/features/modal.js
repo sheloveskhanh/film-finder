@@ -1,9 +1,8 @@
-// assets/components/modal.js
 
 const MovieModal = (function() {
   const $modal     = $('#movie-modal');
   const $container = $modal.find('.modal-content');
-  let lastData = null;  // store last‐shown so we can reapply translations
+  let lastData = null;  
 
   function stopVideo() {
     $container.find('iframe').each(function() {
@@ -87,17 +86,18 @@ const MovieModal = (function() {
   }
 
   return {
-    init() {
-    },
-    show(movie, trailerId, embeddable) {
-      lastData = { movie, trailerId, embeddable };
+  init() {
+    initHandlers();
+  },
+  show(movie, trailerId, embeddable) {
+    lastData = { movie, trailerId, embeddable };
+    render(movie, trailerId, embeddable);
+  },
+  rerender() {
+    if (lastData) {
+      const { movie, trailerId, embeddable } = lastData;
       render(movie, trailerId, embeddable);
-    },
-    rerender() {
-      if (lastData) {
-        const { movie, trailerId, embeddable } = lastData;
-        render(movie, trailerId, embeddable);
-      }
     }
-  };
+  }
+};
 })();

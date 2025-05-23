@@ -11,11 +11,9 @@
   <link rel="stylesheet" href="assets/css/banner.css" />
   <link rel="stylesheet" href="assets/css/navbar.css" />
   <link rel="stylesheet" href="assets/css/search.css" />
-  <link rel="stylesheet" href="assets/css/suggestions.css" />
   <link rel="stylesheet" href="assets/css/results.css" />
   <link rel="stylesheet" href="assets/css/favorites.css" />
   <link rel="stylesheet" href="assets/css/modal.css" />
-  <link rel="stylesheet" href="assets/css/infobox.css" />
   <link rel="stylesheet" href="assets/css/popular.css" />
   <link rel="stylesheet" href="assets/css/filter.css" />
 </head>
@@ -59,26 +57,26 @@
 
   <div class="filters">
     <div class="filter-item">
-      <label for="year-from">Year Range</label>
+      <label id="year-range-label" for="year-from">Year Range</label>
       <input type="number" id="year-from" placeholder="From" min="1900" max="2099" />
       <span>–</span>
       <input type="number" id="year-to" placeholder="To" min="1900" max="2099" />
     </div>
 
     <div class="filter-item">
-      <label>Sort by</label>
+      <label id="sort-by-label">Sort by</label>
       <button type="button" id="sort-button">Sort by ▾</button>
       <ul id="sort-list" class="dropdown-menu"></ul>
     </div>
 
     <div class="filter-item">
-      <label>Country</label>
+      <label id="country-label">Country</label>
       <button type="button" id="country-button">Country ▾</button>
       <ul id="country-list" class="dropdown-menu"></ul>
     </div>
 
     <div class="filter-item">
-      <label>Genre</label>
+      <label id="genre-label">Genre</label>
       <button type="button" id="genre-button-2">Genre ▾</button>
       <ul id="genre-list-2" class="dropdown-menu"></ul>
     </div>
@@ -89,6 +87,9 @@
     </div>
   </div>
 
+
+
+
   <section class="popular-section" id="popular-section">
     <h2>Browse</h2>
     <div class="popular-tabs" id="popular-tabs"></div>
@@ -96,7 +97,7 @@
     <div class="popular-carousel">
       <button id="popular-prev" class="carousel-nav">‹</button>
       <div class="popular-list" id="popular-list"></div>
-      <button id="popular-next" class="carousel-nav">›</button> 
+      <button id="popular-next" class="carousel-nav">›</button>
     </div>
   </section>
 
@@ -109,13 +110,8 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="module" src="assets/components/main.js"></script>
 
-  <script src="assets/components/lang.js"></script>
-  <script src="assets/components/favorites.js"></script>
-  <script src="assets/components/modal.js"></script>
-  <script src="assets/components/infobox.js"></script>
-
-  <script src="assets/components/main.js"></script>
 </body>
 
 </html>
