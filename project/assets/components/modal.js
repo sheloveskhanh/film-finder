@@ -1,6 +1,9 @@
+// assets/components/modal.js
+
 const MovieModal = (function() {
   const $modal     = $('#movie-modal');
   const $container = $modal.find('.modal-content');
+  let lastData = null;  // store last‐shown so we can reapply translations
 
   function stopVideo() {
     $container.find('iframe').each(function() {
@@ -9,30 +12,28 @@ const MovieModal = (function() {
     });
   }
 
-  function init() {
+  function onClose() {
+    stopVideo();
+    $modal.hide();
+  }
+
+  function onOutsideClick(e) {
+    if (e.target === $modal[0]) onClose();
+  }
+
+  function initHandlers() {
     $container
       .off('click', '.close')
-      .on('click', '.close', () => {
-        stopVideo();
-        $modal.hide();
-      });
+      .on('click', '.close', onClose);
 
     $modal
       .off('click', onOutsideClick)
       .on('click', onOutsideClick);
   }
 
-  function onOutsideClick(e) {
-    if (e.target === $modal[0]) {
-      stopVideo();
-      $modal.hide();
-    }
-  }
-
-  function show(movie, trailerId, embeddable) {
-    let trailerSection;
+  function buildTrailerSection(trailerId, embeddable) {
     if (trailerId && embeddable) {
-      trailerSection = `
+      return `
         <div class="modal-trailer">
           <iframe
             src="https://www.youtube.com/embed/${trailerId}"
@@ -40,21 +41,27 @@ const MovieModal = (function() {
             allowfullscreen>
           </iframe>
         </div>`;
-    } else if (trailerId && !embeddable) {
-      trailerSection = `
+    } else if (trailerId) {
+      return `
         <div class="modal-trailer" style="padding:1rem; text-align:center;">
-          <p>This trailer can’t be embedded here. 
+          <p>This trailer can’t be embedded here.
             <a href="https://youtu.be/${trailerId}" target="_blank" rel="noopener">
               Watch on YouTube
             </a>
           </p>
         </div>`;
     } else {
-      trailerSection = `
+      return `
         <div class="modal-trailer" style="padding:1rem; text-align:center;">
           <p>No trailer found.</p>
         </div>`;
     }
+  }
+
+  function render(movie, trailerId, embeddable) {
+    const t = translations[window.currentLang];
+
+    const trailerSection = buildTrailerSection(trailerId, embeddable);
 
     const html = `
       <div class="modal-header">
@@ -64,20 +71,35 @@ const MovieModal = (function() {
         <img src="${movie.Poster}" alt="${movie.Title} Poster">
         <div class="details">
           <h2>${movie.Title}</h2>
-          <p><strong>Genre:</strong> ${movie.Genre}</p>
-          <p><strong>Actors:</strong> ${movie.Actors}</p>
-          <p><strong>Release Date:</strong> ${movie.Released}</p>
-          <p><strong>IMDb Rating:</strong> ${movie.imdbRating}</p>
-          <p><strong>Description:</strong> ${movie.Plot}</p>
+          <p><strong>${t.genreLabel}:</strong> ${movie.Genre}</p>
+          <p><strong>${t.actorsLabel}:</strong> ${movie.Actors}</p>
+          <p><strong>${t.releaseDateLabel}:</strong> ${movie.Released}</p>
+          <p><strong>${t.imdbRatingLabel}:</strong> ${movie.imdbRating}</p>
+          <p><strong>${t.descriptionLabel}:</strong> ${movie.Plot}</p>
         </div>
       </div>
       ${trailerSection}
     `;
 
     $container.html(html);
-    init();
+    initHandlers();
     $modal.show();
   }
 
-  return { init, show };
+  return {
+    init() {
+      // no‐op, everything wired up in show()
+    },
+    show(movie, trailerId, embeddable) {
+      lastData = { movie, trailerId, embeddable };
+      render(movie, trailerId, embeddable);
+    },
+    // used to re‐render when language changes
+    rerender() {
+      if (lastData) {
+        const { movie, trailerId, embeddable } = lastData;
+        render(movie, trailerId, embeddable);
+      }
+    }
+  };
 })();

@@ -1,6 +1,4 @@
-/* assets/css/results.css */
 
-/* Grid container */
 #results {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -94,23 +92,16 @@
   z-index: 2;
 }
 
-/* Show overlay on hover */
 .result-card:hover .card-overlay {
   opacity: 1;
 }
 
-/* Info icon inside overlay */
 .card-overlay .info-icon {
   font-size: 3rem;
   color: #fff;
   text-shadow: 0 0 6px rgba(0,0,0,0.7);
   transition: transform 0.3s ease;
   display: inline-block;
-}
-
-/* Pulse icon on hover */
-.result-card:hover .card-overlay .info-icon {
-  transform: scale(1.3) rotate(10deg);
 }
 
 .pop-card {

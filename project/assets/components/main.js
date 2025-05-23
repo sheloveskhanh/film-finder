@@ -153,25 +153,26 @@ $(function () {
 
   function renderFavoritesDropdown() {
     const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-    $favList.html(
-      !favs.length
-        ? "<li>(no favorites yet)</li>"
-        : favs
-            .map(
-              (m) =>
-                `<li data-id="${m.imdbID}"><span>${m.Title}</span>` +
-                `<button class="remove-fav">&times;</button></li>`
-            )
-            .join("")
-    );
+    if (!favs.length) {
+      $("#favorites-list").html("<li>(no favorites yet)</li>");
+    } else {
+      $("#favorites-list").html(
+        favs
+          .map(
+            (m) =>
+              `<li data-id="${m.imdbID}"><span>${m.Title}</span>` +
+              `<button class="remove-fav">&times;</button></li>`
+          )
+          .join("")
+      );
+    }
   }
-  // Toggle dropdown open/closed
+
   $favButton.on("click", (e) => {
     e.stopPropagation();
     $(".favorites-dropdown").toggleClass("open");
   });
 
-  // Close it when clicking outside
   $(document).on("click", (e) => {
     if (!$(e.target).closest(".favorites-dropdown").length) {
       $(".favorites-dropdown").removeClass("open");
@@ -191,6 +192,26 @@ $(function () {
       reload();
     }
   });
+
+  function renderBrowseTabs() {
+    const t = translations[currentLang];
+    const tabs = [
+      { key: "top_rated", label: t.topMovies },
+      { key: "upcoming", label: t.incoming },
+      { key: "popular", label: t.popularAllTime },
+      { key: "now_playing", label: t.nowPlaying },
+    ];
+    $("#popular-tabs").html(
+      tabs
+        .map(
+          (tab, i) =>
+            `<button data-cat="${tab.key}"${i === 0 ? ' class="active"' : ""}>${
+              tab.label
+            }</button>`
+        )
+        .join("")
+    );
+  }
 
   function renderPopular(list) {
     const html = list
@@ -484,33 +505,63 @@ $(function () {
   });
 
   $("#popular-list").on("click", ".pop-card", function (e) {
-    const imdbID = $(this).data("id");
-    $.getJSON(OMDB_API_URL, {
-      apikey: OMDB_API_KEY,
-      i: imdbID,
-      plot: "full",
-    }).done((md) => {
-      const q = encodeURIComponent(md.Title + " official trailer");
-      $.getJSON(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&q=${q}&key=${YT_API_KEY}`
-      ).done((yt) => {
-        const vid = yt.items?.[0]?.id.videoId;
-        if (vid) {
-          $.getJSON(
-            `https://www.googleapis.com/youtube/v3/videos?part=status&id=${vid}&key=${YT_API_KEY}`
-          ).done((st) =>
-            MovieModal.show(md, vid, st.items?.[0]?.status.embeddable)
-          );
-        } else {
-          MovieModal.show(md, null, false);
-        }
+    const tmdbId = $(this).data("id");
+    $.getJSON(`${TMDB_API_URL}/movie/${tmdbId}`, {
+      api_key: TMDB_API_KEY,
+      language: "en-US",
+      append_to_response: "external_ids",
+    }).done((tmdb) => {
+      const imdbID = tmdb.external_ids.imdb_id;
+      if (!imdbID) return;
+      $.getJSON(OMDB_API_URL, {
+        apikey: OMDB_API_KEY,
+        i: imdbID,
+        plot: "full",
+      }).done((omdb) => {
+        const q = encodeURIComponent(omdb.Title + " official trailer");
+        $.getJSON("https://www.googleapis.com/youtube/v3/search", {
+          part: "snippet",
+          type: "video",
+          maxResults: 1,
+          q,
+          key: YT_API_KEY,
+        }).done((yt) => {
+          const vid = yt.items?.[0]?.id.videoId;
+          if (vid) {
+            $.getJSON("https://www.googleapis.com/youtube/v3/videos", {
+              part: "status",
+              id: vid,
+              key: YT_API_KEY,
+            }).done((st) =>
+              MovieModal.show(omdb, vid, st.items?.[0]?.status.embeddable)
+            );
+          } else {
+            MovieModal.show(omdb, null, false);
+          }
+        });
       });
     });
   });
 
+  $("#language-switch").on("change", () => {
+    applyTranslations(currentLang);
+    applyFilterTranslations(currentLang);
+    renderBrowseTabs();
+    loadPopular($("#popular-tabs button.active").data("cat"));
+  });
+
   $("#popular-list").on("click", ".info-icon", function (e) {
-    e.stopPropagation(); 
+    e.stopPropagation();
     $(this).closest(".pop-card").trigger("click");
+  });
+
+
+  $("#language-switch").on("change", function () {
+    currentLang = this.value;
+    applyTranslations(currentLang);
+    renderBrowseTabs();
+    loadPopular($("#popular-tabs button.active").data("cat"));
+    MovieModal.rerender()
   });
 
   loadPopular("top_rated");
