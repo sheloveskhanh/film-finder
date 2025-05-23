@@ -108,11 +108,6 @@
   display: inline-block;
 }
 
-/* Pulse icon on hover */
-.result-card:hover .card-overlay .info-icon {
-  transform: scale(1.3) rotate(10deg);
-}
-
 .pop-card {
   position: relative;
   overflow: hidden;
