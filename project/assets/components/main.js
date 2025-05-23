@@ -543,27 +543,47 @@ $(function () {
     });
   });
 
-  $("#language-switch").on("change", () => {
-    applyTranslations(currentLang);
-    applyFilterTranslations(currentLang);
-    renderBrowseTabs();
-    loadPopular($("#popular-tabs button.active").data("cat"));
-  });
-
-  $("#popular-list").on("click", ".info-icon", function (e) {
-    e.stopPropagation();
-    $(this).closest(".pop-card").trigger("click");
-  });
-
-
   $("#language-switch").on("change", function () {
     currentLang = this.value;
-    applyTranslations(currentLang);
-    renderBrowseTabs();
-    loadPopular($("#popular-tabs button.active").data("cat"));
-    MovieModal.rerender()
-  });
 
+    applyTranslations(currentLang);
+    if (typeof applyFilterTranslations === "function") {
+      applyFilterTranslations(currentLang);
+    }
+
+    renderBrowseTabs();
+
+    const cat = $("#popular-tabs button.active").data("cat");
+    loadPopular(cat);
+
+    renderFavoritesDropdown();
+
+    if (MovieModal.rerender) {
+      MovieModal.rerender();
+    }
+  });
+  applyFilters();
+  $searchInput.on("input", function () {
+    const q = $(this).val().trim();
+    if (q) {
+      filterState.page = 1;
+      reload();
+    } else {
+      $results.empty();
+      $pagination.empty();
+    }
+  });
+  
+  $favList.on("click", ".remove-fav", function (e) {
+    e.stopPropagation();
+    const id = $(this).closest("li").data("id");
+    Favorites.remove(id, renderFavoritesDropdown);
+  });
+  
+  renderBrowseTabs();
+  loadPopular("popular");
+  loadPopular("upcoming");
+  loadPopular("now_playing");
   loadPopular("top_rated");
   reload();
 });

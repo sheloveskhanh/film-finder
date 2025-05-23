@@ -88,13 +88,11 @@ const MovieModal = (function() {
 
   return {
     init() {
-      // no‐op, everything wired up in show()
     },
     show(movie, trailerId, embeddable) {
       lastData = { movie, trailerId, embeddable };
       render(movie, trailerId, embeddable);
     },
-    // used to re‐render when language changes
     rerender() {
       if (lastData) {
         const { movie, trailerId, embeddable } = lastData;
