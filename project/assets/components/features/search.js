@@ -1,4 +1,4 @@
-const Search = (function(){
+export const Search = function(){
   let $input, $button;
 
   function init() {
@@ -20,4 +20,5 @@ const Search = (function(){
   }
 
   return { init };
-})();
+};
+

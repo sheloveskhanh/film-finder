@@ -1,4 +1,4 @@
-const Favorites = (function() {
+export const Favorites = function() {
   const STORAGE_KEY = 'favorites';
 
   function load() {
@@ -9,10 +9,10 @@ const Favorites = (function() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
-  function render(onRemove) {
+  function render(onRemove = () => {}) {
     const favs = load();
     const items = favs.map(m =>
-      `<li data-id="${m.imdbID}">${m.Title} <button class="remove-fav">${translations[currentLang].removeFavorite}</button></li>`
+      `<li data-id="${m.imdbID}">${m.Title} <button class="remove-fav">Remove</button></li>`
     ).join('');
     $('#favorites-list').html(items);
     $('#favorites-list').off('click').on('click', '.remove-fav', function() {
@@ -38,4 +38,4 @@ const Favorites = (function() {
   }
 
   return { render, add, remove };
-})();
+};

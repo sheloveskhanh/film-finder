@@ -1,13 +1,5 @@
 
-const Filters = (function(){
-  const filterState = {
-    yearFrom: null,
-    yearTo:   null,
-    sortBy:   null,
-    country:  null,
-    genres:   [],
-    page:     1
-  };
+export const Filters = function(filterState) {
 
   function init(){
     function closeAllDropdowns() { $('.dropdown-menu').hide(); }
@@ -90,4 +82,4 @@ const Filters = (function(){
   function getState(){ return {...filterState}; }
 
   return { init, getState };
-})();
+};

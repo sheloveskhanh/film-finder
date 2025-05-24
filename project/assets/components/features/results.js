@@ -1,4 +1,4 @@
-const Results = (function(){
+export const Results = function(){
   let $results, $pagination;
 
   function init() {
@@ -46,7 +46,6 @@ const Results = (function(){
     }).join('');
     $results.html(html);
 
-    // render pager
     let ctrl = `<button ${currentPage===1?'disabled':''} data-page="${currentPage-1}">Prev</button>
                 <span class="page-info">Page <span class="current-page">${currentPage}</span> of ${totalPages}</span>
                 <button ${currentPage===totalPages?'disabled':''} data-page="${currentPage+1}">Next</button>`;
@@ -54,4 +53,4 @@ const Results = (function(){
   }
 
   return { init, render };
-})();
+};

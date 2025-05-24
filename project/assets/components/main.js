@@ -1,125 +1,144 @@
-import MovieModal from './components/modal.js';
-import { initLangSwitch } from './features/lang.js';
-import { initFavorites } from './features/favorites.js';
-import { initFilters, applyFilterTranslations } from './features/filters.js';
-import { initSearch } from './features/search.js';
-import { initResults } from './features/results.js';
-import { initPagination } from './features/pagination.js';
-import { initPopular } from './features/popular.js';
+import { Favorites }      from "./features/favorites.js";
+import { Filters }        from "./features/filters.js";
+import { initLangSwitch, applyTranslations, translations } from "./features/lang.js";
+import { MovieModal } from "./features/modal.js";
+import { renderPagination, Pagination } from "./features/pagination.js";
+import { initPopular }    from "./features/popular.js";
+import { Results }        from "./features/results.js";
+import { Search }         from "./features/search.js";
 
-// TMDB / OMDB back-end
-import { fetchMovieDetails, fetchTrailerInfo } from './components/config/tmdb.js';
+import { fetchSearchResults, fetchMovieDetails } from "./config/tmdbServices.js";
 
 $(function() {
-  // --- global state --------------------------------------------------------
-  window.currentLang = 'en';
-  let state = { page: 1, query: '', yearFrom: null, yearTo: null, sortBy: null, country: null, genres: [] };
+  window.currentLang = "en";
 
-  // --- initialize all components ------------------------------------------
+  const state = {
+    page:      1,
+    query:     "",
+    yearFrom:  null,
+    yearTo:    null,
+    sortBy:    null,
+    country:   null,
+    genres:    [],
+  };
 
-  // 1) modal (no DOM selectors needed here)
-  MovieModal.init();
-
-  // 2) language switcher
-  initLangSwitch('#language-switch', newLang => {
+  initLangSwitch("#language-switch", newLang => {
     window.currentLang = newLang;
-    applyFilterTranslations(newLang);
     applyTranslations(newLang);
-    // re-render everything in the new language
     renderBrowseTabs();
     reload();
-    MovieModal.rerender();
   });
 
-  // 3) favorites dropdown
-  initFavorites('#favorites-button', '#favorites-list');
+  const favorites = Favorites();
 
-  // 4) filters (year / sort / country / genre / clear)
-  initFilters({
-    yearFromInput: '#year-from',
-    yearToInput:   '#year-to',
-    sortButton:    '#sort-button',
-    sortList:      '#sort-list',
-    countryButton: '#country-button',
-    countryList:   '#country-list',
-    genreButton:   '#genre-button-2',
-    genreList:     '#genre-list-2',
-    clearButton:   '#clear-filters',
-    onChange:      () => { state.page = 1; reload(); }
+  function handleRemove(id) {
+    favorites.remove(id, () => {
+      favorites.render(handleRemove);
+    });
+  }
+
+  $('#favorites-button').on('click', function () {
+    $('#favorites-list').show();
+    favorites.render(handleRemove);
   });
 
-  // 5) search bar
-  initSearch('#search-input', '#search-button', q => {
+  Filters({
+    yearFromInput: "#year-from",
+    yearToInput:   "#year-to",
+    sortButton:    "#sort-button",
+    sortList:      "#sort-list",
+    countryButton: "#country-button",
+    countryList:   "#country-list",
+    genreButton:   "#genre-button-2",
+    genreList:     "#genre-list-2",
+    clearButton:   "#clear-filters",
+    onChange: () => {
+      state.page     = 1;
+      state.yearFrom = +$("#year-from").val() || null;
+      state.yearTo   = +$("#year-to").val()   || null;
+      state.sortBy   = $("#sort-list li.active").data("sort") || null;
+      state.country  = $("#country-list li.active").data("code") || null;
+      state.genres   = $("#genre-list-2 li.active").map((i,el)=>$(el).data("id")).get();
+      reload();
+    }
+  });
+
+  $(document).on('click', function (e) {
+  if (
+    !$(e.target).closest('#favorites-list').length &&
+    !$(e.target).is('#favorites-button')
+  ) {
+    $('#favorites-list').hide();
+  }
+  });
+  
+
+  Search("#search-input", "#search-button", q => {
     state.query = q;
-    state.page = 1;
+    state.page  = 1;
     reload();
   });
 
-  // 6) results grid + “ℹ️” click handler
-  initResults('#results', imdbID => showMovieModal(imdbID));
+  const results = Results("#results", imdbID => {
+    fetchMovieDetails(imdbID).then(({ data, trailerId, embeddable }) => {
+      MovieModal.show(data, trailerId, embeddable);
+    });
+  });
+  results.init();
 
-  // 7) pagination controls
-  initPagination('#pagination', page => {
-    state.page = page;
+  renderPagination("#pagination", state.page, 1);
+  Pagination("#pagination", newPage => {
+    state.page = newPage;
     reload();
   });
 
   initPopular(
-    $('#popular-tabs'),
-    $('#popular-list'),
+    $("#popular-tabs"),
+    $("#popular-list"),
     tmdbId => {
-      // lookup imdbID then show modal
-      fetchMovieDetails(tmdbId).then(({ omdbData, trailerId, embeddable }) => {
-        showMovieModal(omdbData.imdbID, omdbData, trailerId, embeddable);
+      fetchMovieDetails(tmdbId).then(({ data, trailerId, embeddable }) => {
+        MovieModal.show(data, trailerId, embeddable);
       });
     }
   );
 
-
-
-  function reload() {
-    const hasQuery   = Boolean(state.query);
-    const hasFilters = Boolean(state.yearFrom || state.yearTo || state.sortBy || state.country || state.genres.length);
-
-    $('#popular-section').toggle(!hasQuery && !hasFilters);
-
-    if (hasQuery || hasFilters) {
-      // unified “discover / search” fetch
-      fetchSearchResults(state).then(({ movies, totalPages }) => {
-        initResults.render(movies);
-        initPagination.render(state.page, totalPages);
-      });
-    }
-  }
-
-  function showMovieModal(imdbID, omdbData = null, trailerId = null, embeddable = false) {
-    const promise = omdbData
-      ? Promise.resolve({ data: omdbData, trailerId, embeddable })
-      : fetchMovieDetails(imdbID);
-
-    promise.then(({ data, trailerId, embeddable }) => {
-      MovieModal.show(data, trailerId, embeddable);
-    });
-  }
-
   function renderBrowseTabs() {
     const t = translations[window.currentLang];
     const tabs = [
-      { key: 'top_rated',    label: t.topMovies },
-      { key: 'upcoming',     label: t.incoming },
-      { key: 'popular',      label: t.popularAllTime },
-      { key: 'now_playing',  label: t.nowPlaying },
+      { key: "top_rated",    label: t.topMovies      },
+      { key: "upcoming",     label: t.incoming       },
+      { key: "popular",      label: t.popularAllTime },
+      { key: "now_playing",  label: t.nowPlaying     },
     ];
-    $('#popular-tabs').html(
+    $("#popular-tabs").html(
       tabs.map((tab,i) =>
         `<button data-cat="${tab.key}"${i===0?' class="active"':''}>${tab.label}</button>`
-      ).join('')
+      ).join("")
     );
   }
 
-  // first-time render
-  applyFilterTranslations(window.currentLang);
-  applyTranslations(window.currentLang);
+  function reload() {
+    const hasQuery   = Boolean(state.query);
+    const hasFilters = Boolean(
+      state.yearFrom ||
+      state.yearTo   ||
+      state.sortBy   ||
+      state.country  ||
+      state.genres.length
+    );
+    $("#popular-section").toggle(!hasQuery && !hasFilters);
+
+    if (hasQuery || hasFilters) {
+      fetchSearchResults(state).then(({ movies, totalPages }) => {
+        results.render(movies, state.page, totalPages); // Pass all three arguments
+        renderPagination("#pagination", state.page, totalPages);
+      });
+    } else {
+      $("#results, #pagination").empty();
+    }
+  }
+
   renderBrowseTabs();
+  applyTranslations(window.currentLang);
   reload();
 });
