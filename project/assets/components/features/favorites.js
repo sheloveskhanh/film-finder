@@ -12,7 +12,7 @@ export const Favorites = function() {
   function render(onRemove = () => {}) {
     const favs = load();
     const items = favs.map(m =>
-      `<li data-id="${m.imdbID}">${m.Title} <button class="remove-fav">Remove</button></li>`
+      `<li data-id="${m.imdbID}">${m.Title} <button class="remove-fav">x</button></li>`
     ).join('');
     $('#favorites-list').html(items);
     $('#favorites-list').off('click').on('click', '.remove-fav', function() {

@@ -1,4 +1,10 @@
-export const Results = function(){
+import { translations } from "./lang.js";
+import { Favorites } from "./favorites.js";
+import { renderPagination } from "./pagination.js";
+import { MovieModal } from "./modal.js";
+
+
+export const Results = function () {
   let $results, $pagination;
 
   function init() {
@@ -20,27 +26,27 @@ export const Results = function(){
       Favorites.add({ imdbID:id, Title:title }, renderFavoritesDropdown);
     });
 
-    // Card click → modal
-    $results.on('click','.result-card', function(e){
-      if ($(e.target).is('.add-fav')) return;
-      const imdbID = $(this).data('id');
+    $results.on('click', '.info-icon', function(e) {
+      e.stopPropagation();
+      const $card = $(this).closest('.result-card');
+      const imdbID = $card.data('id');
+        console.log("Info icon clicked, imdbID:", imdbID);
       $(document).trigger('card:clicked', imdbID);
     });
   }
 
   function render(list, currentPage, totalPages) {
-    // render cards
     const html = list.map(m=>{
       const poster = m.poster_path
         ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
-        : 'https://via.placeholder.com/180x260?text=No+Image';
+        : 'https://placehold.co/180x260?text=No+Image';
       return `
         <div class="result-card" data-id="${m.id}" data-year="${m.release_date?.slice(0,4)||''}">
           <img src="${poster}" alt="${m.title} poster">
           <div class="card-overlay"><span class="info-icon">ℹ️</span></div>
           <div class="result-info">
             <div class="title">${m.title} (${m.release_date?.slice(0,4)||''})</div>
-            <button class="add-fav">${translations[currentLang].addFavorite}</button>
+            <button class="add-fav">${translations[window.currentLang].addFavorite}</button>
           </div>
         </div>`;
     }).join('');
@@ -54,3 +60,6 @@ export const Results = function(){
 
   return { init, render };
 };
+
+const results = Results();
+results.init();

@@ -1,4 +1,3 @@
-
 import {
   POPULAR_URL,
   TOP_RATED_URL,

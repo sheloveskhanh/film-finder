@@ -1,5 +1,4 @@
-
-export const MovieModal = function() {
+export const MovieModal = function () {
   const $modal     = $('#movie-modal');
   const $container = $modal.find('.modal-content');
   let lastData = null;  
