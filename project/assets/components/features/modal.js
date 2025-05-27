@@ -1,3 +1,5 @@
+import { translations } from "./lang.js"; 
+
 export const MovieModal = function () {
   const $modal     = $('#movie-modal');
   const $container = $modal.find('.modal-content');
@@ -56,15 +58,12 @@ export const MovieModal = function () {
     }
   }
 
-  function render(movie, trailerId, embeddable) {
+ function render(movie, trailerId, embeddable) {
     const t = translations[window.currentLang];
-
     const trailerSection = buildTrailerSection(trailerId, embeddable);
 
     const html = `
-      <div class="modal-header">
-        <span class="close">&times;</span>
-      </div>
+      <div class="modal-header"><span class="close">&times;</span></div>
       <div class="modal-body">
         <img src="${movie.Poster}" alt="${movie.Title} Poster">
         <div class="details">
@@ -85,18 +84,17 @@ export const MovieModal = function () {
   }
 
   return {
-  init() {
-    initHandlers();
-  },
-  show(movie, trailerId, embeddable) {
-    lastData = { movie, trailerId, embeddable };
-    render(movie, trailerId, embeddable);
-  },
-  rerender() {
-    if (lastData) {
-      const { movie, trailerId, embeddable } = lastData;
+    init() {
+      initHandlers();
+    },
+    show(movie, trailerId, embeddable) {
+      lastData = { movie, trailerId, embeddable };
       render(movie, trailerId, embeddable);
+    },
+    rerender() {
+      if (lastData) {
+        render(lastData.movie, lastData.trailerId, lastData.embeddable);
+      }
     }
-  }
-};
-};
+  };
+})();

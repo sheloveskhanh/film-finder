@@ -133,3 +133,8 @@
   position: relative;
   z-index: 1;
 }
+
+.card-overlay .info-icon {
+  pointer-events: auto;
+  cursor: pointer;
+}

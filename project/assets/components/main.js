@@ -94,7 +94,7 @@ $(function () {
 
   const results = Results("#results", (imdbID) => {
     fetchMovieDetails(imdbID).then(({ data, trailerId, embeddable }) => {
-      movieModal.show(data, trailerId, embeddable);
+      MovieModal.show(data, trailerId, embeddable);
     });
   });
   results.init();
@@ -107,7 +107,7 @@ $(function () {
 
   initPopular($("#popular-tabs"), $("#popular-list"), (tmdbId) => {
     fetchMovieDetails(tmdbId).then(({ data, trailerId, embeddable }) => {
-      movieModal.show(data, trailerId, embeddable);
+      MovieModal.show(data, trailerId, embeddable);
     });
   });
 
@@ -158,7 +158,7 @@ $(function () {
 
   $(document).on("card:clicked", function (e, imdbID) {
     fetchMovieDetails(imdbID).then(({ data, trailerId, embeddable }) => {
-      MovieModal.show(data, trailerId, embeddable);
+      MovieModal(data, trailerId, embeddable);
     });
   });
 });
