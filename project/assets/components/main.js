@@ -1,3 +1,5 @@
+// project/components/main.js
+
 import {
   fetchGenres,
   fetchCountries,
@@ -8,7 +10,6 @@ import {
 } from "./tmdbService.js";
 
 import { MovieModal } from "./modal.js";
-
 
 import {
   buildGenreListItem,
@@ -44,9 +45,7 @@ $(function () {
   window.currentLang = "en";
   applyTranslations(currentLang);
 
-
   const movieDetailsCache = {};
-  // Cache trailer IDs: { imdbID: videoId }
   const trailerCache = {};
 
   const $searchInput = $("#search-input");
@@ -56,26 +55,25 @@ $(function () {
   const $favButton = $("#favorites-button");
   const $favList = $("#favorites-list");
   const $clearFilters = $("#clear-filters");
-  const genreRev = {};       // { genreId: genreName, … }
-  const countryMap = {};     // { countryCode: english_name, … }
 
-  //------------- 4) INITIAL LOAD: GENRES & COUNTRIES -------------
+  const genreRev = {};
+  const countryMap = {};
+
   (async function loadInitialData() {
     try {
-      const genres = await fetchGenres(); // [ { id, name } … ]
+      const genres = await fetchGenres();
       genres.forEach((g) => {
         genreRev[g.id] = g.name;
         $("#genre-list-2").append(buildGenreListItem(g));
       });
 
-      const countries = await fetchCountries(); // [ { iso_3166_1, english_name } … ]
+      const countries = await fetchCountries();
       countries.forEach((c) => {
         countryMap[c.iso_3166_1] = c.english_name;
         $("#country-list").append(buildCountryListItem(c));
       });
     } catch (err) {
       console.error("Failed to load initial TMDB data:", err);
-      // Optionally show an error banner in the UI
     }
   })();
 
@@ -88,13 +86,12 @@ $(function () {
     $("#sort-list").append(buildSortOptionItem(o));
   });
 
-  //------------- 6) UTILITY: CLOSE DROPDOWNS -------------
   function closeAllDropdowns() {
     $(".dropdown-menu").hide();
   }
   $(document).on("click", closeAllDropdowns);
 
-  //------------- 7) FILTER INPUT HANDLERS -------------
+  //------------- 4) FILTER INPUT HANDLERS -------------
   $("#year-from, #year-to").on("input", () => {
     filterState.yearFrom = parseInt($("#year-from").val()) || null;
     filterState.yearTo = parseInt($("#year-to").val()) || null;
@@ -171,12 +168,10 @@ $(function () {
     reloadResults();
   });
 
-  //------------- 8) FAVORITES LOGIC -------------
-  // Simple Favorites helper object (mirrors what you had in Favorites.js)
+  //------------- 5) FAVORITES LOGIC -------------
   const Favorites = {
     add(movieObj, callback) {
       const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-      // Prevent duplicates by checking imdbID
       if (!favs.some((m) => m.imdbID === movieObj.imdbID)) {
         favs.push(movieObj);
         localStorage.setItem("favorites", JSON.stringify(favs));
@@ -192,9 +187,9 @@ $(function () {
     render: renderFavoritesDropdown,
   };
 
-  //------------- 9) LANGUAGE SWITCH -------------
+  //------------- 6) LANGUAGE SWITCH -------------
   $("#language-switch").on("change", function () {
-    currentLang = this.value;
+    window.currentLang = this.value;
     applyTranslations(currentLang);
     if (typeof applyFilterTranslations === "function") {
       applyFilterTranslations(currentLang);
@@ -206,7 +201,6 @@ $(function () {
     if (MovieModal.rerender) MovieModal.rerender();
   });
 
-  // Utility: returns an array like [ { key: "topRated", label: "Top Movies" }, … ]
   function getBrowseTabsConfig(lang) {
     const t = translations[lang];
     return [
@@ -217,37 +211,30 @@ $(function () {
     ];
   }
 
-  //------------- 10) RENDERING BROWSE CAROUSELS -------------
   function setupBrowseTabs() {
     const tabs = getBrowseTabsConfig(currentLang);
-    // 1) Render buttons
     renderBrowseTabs(tabs);
-    // 2) Load each category into its own container
     tabs.forEach((tab) => {
       loadAndRenderCategory(tab.key);
     });
   }
 
   async function loadAndRenderCategory(categoryKey) {
-    // categoryKey is one of "popular", "topRated", "upcoming", "nowPlaying"
     try {
       const movies = await fetchCategory(categoryKey);
       renderPopularList(categoryKey, movies);
     } catch (err) {
       console.error(`Failed to load ${categoryKey}:`, err);
-      // Optionally show a small “Could not load” message in that carousel section
+      // Optionally show a small “Could not load” message in that carousel
     }
   }
 
-  // Tab click handler
   $("#popular-tabs").on("click", "button", function () {
     $("#popular-tabs button").removeClass("active");
     $(this).addClass("active");
     const cat = $(this).data("cat");
     loadAndRenderCategory(cat);
   });
-
-  // Scroll controls:
   $("#popular-prev").on("click", () => {
     const $list = $("#popular-list");
     $list.animate({ scrollLeft: "-=" + $list.width() }, 400);
@@ -257,7 +244,6 @@ $(function () {
     $list.animate({ scrollLeft: "+=" + $list.width() }, 400);
   });
 
-  //------------- 11) RELOAD SEARCH / FILTERED RESULTS -------------
   async function reloadResults() {
     const q = $searchInput.val().trim();
     const hasFilters = Boolean(
@@ -274,13 +260,11 @@ $(function () {
 
     try {
       if (q) {
-        // Text search
         const { movies, totalPages } = await searchMovies(q, filterState.page);
         renderResults(movies);
         renderPager(filterState.page, totalPages);
         annotateTmdbDetails(movies);
       } else if (hasFilters) {
-        // Discover with filters
         const { movies, totalPages } = await discoverMovies(
           filterState,
           filterState.page
@@ -289,16 +273,13 @@ $(function () {
         renderPager(filterState.page, totalPages);
         annotateTmdbDetails(movies);
       }
-      // else: empty results (both #results and #pagination are already cleared)
     } catch (err) {
       console.error("Error during reloadResults():", err);
-      // Optionally show an error banner: “Couldn’t load search/discover results.”
     }
   }
 
   function annotateTmdbDetails(movieArray) {
     movieArray.forEach(async (m) => {
-      // If we already have cached details for this TMDB ID, just call applyFilters()
       if (movieDetailsCache[m.id]) {
         applyFiltersToCard(m.id, movieDetailsCache[m.id]);
         return;
@@ -314,11 +295,9 @@ $(function () {
   }
 
   function applyFiltersToCard(tmdbId, detail) {
-    // 1. Find the <div class="result-card" data-tmdb-id="...">
     const $card = $results.find(`.result-card[data-tmdb-id="${tmdbId}"]`);
     if (!$card.length) return;
 
-    // 2. Attach data attributes from detail:
     const genres = detail.genres.map((g) => g.name).join(", ");
     const country = detail.production_countries.map((c) => c.name).join(", ");
     $card
@@ -328,7 +307,6 @@ $(function () {
       .attr("data-votes", detail.vote_count)
       .attr("data-imdb-id", detail.external_ids?.imdb_id || "");
 
-    // 3. Now run the same filter logic you had before:
     const yearFrom = filterState.yearFrom,
       yearTo = filterState.yearTo,
       countryCode = filterState.country,
@@ -355,7 +333,6 @@ $(function () {
 
     $card.toggle(ok);
 
-    // 4. Sorting: if filterState.sortBy is set, we need to re-order the visible cards
     if (filterState.sortBy) {
       const visible = $results.find(".result-card:visible").toArray();
       visible.sort((a, b) => {
@@ -390,7 +367,6 @@ $(function () {
     }
   }
 
-  //------------- 12) PAGINATION CLICK -------------
   $pagination.on("click", "button", function () {
     const p = $(this).data("page");
     if (p) {
@@ -399,7 +375,6 @@ $(function () {
     }
   });
 
-  //------------- 13) SEARCH INPUT / BUTTON -------------
   $searchButton.on("click", () => {
     filterState.page = 1;
     reloadResults();
@@ -419,15 +394,15 @@ $(function () {
     }
   });
 
-  //------------- 14) ADD / REMOVE FAVORITES -------------
   $results.on("click", ".add-fav", function (e) {
     e.stopPropagation();
     const $card = $(this).closest(".result-card");
     const imdbID = $card.attr("data-imdb-id");
     const title = $card.find(".title").text();
-    // If detail hasn’t returned yet, imdbID might be empty:
     if (!imdbID) {
-      alert("Please wait a moment for details to load before adding to favorites.");
+      alert(
+        "Please wait a moment for details to load before adding to favorites."
+      );
       return;
     }
     Favorites.add({ imdbID, Title: title }, renderFavoritesDropdown);
@@ -449,17 +424,119 @@ $(function () {
     Favorites.remove(id, renderFavoritesDropdown);
   });
 
-  //------------- 15) CARD CLICK → OPEN MODAL -------------
   $results.on("click", ".result-card", async function (e) {
-    if ($(e.target).is(".add-fav")) return; // ignore if they clicked the “Add to fav” button
-    const imdbID = $(this).attr("data-imdb-id");
+    if ($(e.target).is(".add-fav")) return;
+
+    const $card = $(this);
+    const tmdbId = $card.attr("data-tmdb-id");
+
+    // 1) Fetch TMDB detail if not cached
+    let detail;
+    if (movieDetailsCache[tmdbId]) {
+      detail = movieDetailsCache[tmdbId];
+    } else {
+      MovieModal.showLoading();
+      try {
+        detail = await getMovieDetails(tmdbId);
+        movieDetailsCache[tmdbId] = detail;
+      } catch (err) {
+        console.error("TMDB detail fetch failed:", err);
+        MovieModal.showError("Could not load movie details.");
+        return;
+      }
+    }
+
+    // 2) Check IMDb ID
+    const imdbID = detail.external_ids?.imdb_id;
     if (!imdbID) {
-      alert("Still loading details… please try again in a second.");
+      MovieModal.showTMDBOnly(detail);
       return;
     }
 
+    // 3) Show loading while calling OMDB + YouTube
+    MovieModal.showLoading();
+
     try {
-      // 1) Fetch from OMDB
+      // 4) Fetch OMDB data
+      const omdbData = await new Promise((resolve, reject) => {
+        $.getJSON(
+          "https://www.omdbapi.com/",
+          { apikey: OMDB_API_KEY, i: imdbID, plot: "full" },
+          (md) => resolve(md)
+        ).fail((_, status, err) => reject(err));
+      });
+
+      // 5) Fetch YouTube trailer (pass raw string to q:)
+      const rawQuery = omdbData.Title + " official trailer";
+      const ytSearch = await new Promise((resolve, reject) => {
+        $.getJSON(
+          "https://www.googleapis.com/youtube/v3/search",
+          {
+            part: "snippet",
+            type: "video",
+            maxResults: 1,
+            q: rawQuery, // no encodeURIComponent
+            key: YT_API_KEY,
+          },
+          (ytData) => resolve(ytData)
+        ).fail((_, status, err) => reject(err));
+      });
+
+      const videoId = ytSearch.items?.[0]?.id.videoId || null;
+      let embeddable = false;
+      if (videoId) {
+        const statusData = await new Promise((resolve, reject) => {
+          $.getJSON(
+            "https://www.googleapis.com/youtube/v3/videos",
+            { part: "status", id: videoId, key: YT_API_KEY },
+            (sd) => resolve(sd)
+          ).fail((_, status, err) => reject(err));
+        });
+        embeddable = statusData.items?.[0]?.status.embeddable || false;
+      }
+
+      // 6) Finally show full modal
+      MovieModal.show(omdbData, videoId, embeddable);
+    } catch (err) {
+      console.error("OMDB or YouTube fetch failed:", err);
+      MovieModal.showError(
+        "Failed to load movie details. Please try again later."
+      );
+    }
+  });
+
+  $("#popular-list").on("click", ".pop-card", async function (e) {
+    const $card = $(this);
+    const tmdbId = $card.attr("data-id");
+
+    // 1) Fetch TMDB detail if not cached
+    let detail;
+    if (movieDetailsCache[tmdbId]) {
+      detail = movieDetailsCache[tmdbId];
+    } else {
+      MovieModal.showLoading();
+      try {
+        detail = await getMovieDetails(tmdbId);
+        movieDetailsCache[tmdbId] = detail;
+      } catch (err) {
+        console.error("TMDB detail fetch failed:", err);
+        MovieModal.showError("Could not load movie details.");
+        return;
+      }
+    }
+
+    // 2) Check IMDb ID
+    const imdbID = detail.external_ids?.imdb_id;
+    if (!imdbID) {
+      MovieModal.showTMDBOnly(detail);
+      return;
+    }
+
+    // 3) Show loading while calling OMDB + YouTube
+    MovieModal.showLoading();
+
+    try {
+      // 4) Fetch OMDB data
       const omdbData = await new Promise((resolve, reject) => {
         $.getJSON(
           OMDB_API_URL,
@@ -468,53 +545,42 @@ $(function () {
         ).fail((_, status, err) => reject(err));
       });
 
-      // 2) Look for trailer: check cache first
-      let vid = trailerCache[imdbID];
+      // 5) Fetch YouTube trailer (PASS RAW STRING, no encodeURIComponent)
+      const rawQuery = omdbData.Title + " official trailer";
+      const ytSearch = await new Promise((resolve, reject) => {
+        $.getJSON(
+          "https://www.googleapis.com/youtube/v3/search",
+          {
+            part: "snippet",
+            type: "video",
+            maxResults: 1,
+            q: rawQuery, // jQuery will encode this once
+            key: YT_API_KEY,
+          },
+          (ytData) => resolve(ytData)
+        ).fail((_, status, err) => reject(err));
+      });
+
+      const videoId = ytSearch.items?.[0]?.id.videoId || null;
       let embeddable = false;
-      if (!vid) {
-        const query = encodeURIComponent(omdbData.Title + " official trailer");
-        const ytSearch = await new Promise((resolve, reject) => {
-          $.getJSON(
-            "https://www.googleapis.com/youtube/v3/search",
-            {
-              part: "snippet",
-              type: "video",
-              maxResults: 1,
-              q: query,
-              key: YT_API_KEY,
-            },
-            (data) => resolve(data)
-          ).fail((_, status, err) => reject(err));
-        });
-        vid = ytSearch.items?.[0]?.id.videoId;
-        if (vid) {
-          trailerCache[imdbID] = vid;
-          // Check embeddable
-          const statusResp = await new Promise((resolve, reject) => {
-            $.getJSON(
-              "https://www.googleapis.com/youtube/v3/videos",
-              { part: "status", id: vid, key: YT_API_KEY },
-              (data) => resolve(data)
-            ).fail((_, status, err) => reject(err));
-          });
-          embeddable = statusResp.items?.[0]?.status.embeddable;
-        }
-      } else {
-        // We already have a cached vid, so re-check embeddable:
-        const statusResp = await new Promise((resolve, reject) => {
+      if (videoId) {
+        const statusData = await new Promise((resolve, reject) => {
           $.getJSON(
             "https://www.googleapis.com/youtube/v3/videos",
-            { part: "status", id: vid, key: YT_API_KEY },
-            (data) => resolve(data)
+            { part: "status", id: videoId, key: YT_API_KEY },
+            (sd) => resolve(sd)
           ).fail((_, status, err) => reject(err));
         });
-        embeddable = statusResp.items?.[0]?.status.embeddable;
+        embeddable = statusData.items?.[0]?.status.embeddable || false;
       }
 
-      MovieModal.show(omdbData, vid, embeddable);
+      // 6) Finally show full modal
+      MovieModal.show(omdbData, videoId, embeddable);
     } catch (err) {
-      console.error("Error opening modal for IMDb ID", imdbID, err);
-      alert("Failed to load movie details. Please try again later.");
+      console.error("OMDB or YouTube fetch failed:", err);
+      MovieModal.showError(
+        "Failed to load movie details. Please try again later."
+      );
     }
   });
 

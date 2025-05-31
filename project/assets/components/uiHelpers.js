@@ -9,7 +9,9 @@ export function buildGenreListItem(genre) {
  *   - Given a country object { iso_3166_1, english_name }, returns <li>.
  */
 export function buildCountryListItem(country) {
-  return $(`<li data-code="${country.iso_3166_1}">${country.english_name}</li>`);
+  return $(
+    `<li data-code="${country.iso_3166_1}">${country.english_name}</li>`
+  );
 }
 
 /**
@@ -37,14 +39,7 @@ export function renderBrowseTabs(tabs) {
   $("#popular-tabs").html(html);
 }
 
-/**
- * renderPopularList
- *   - Given a TMDB category key (e.g. "popular", "upcoming", etc.)
- *   - and an array of TMDB movie‐summary objects (with poster_path, title, id),
- *   - sets the HTML of the matching container (e.g. "#popular-list", "#upcoming-list", …).
- */
 export function renderPopularList(category, movieArray) {
-  // Map TMDB category keys to container IDs:
   const containerMap = {
     popular: "#popular-list",
     upcoming: "#upcoming-list",
@@ -57,7 +52,8 @@ export function renderPopularList(category, movieArray) {
     .map((m) => {
       const imgUrl = m.poster_path
         ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
-        : "https://via.placeholder.com/180x260?text=No+Image";
+        : "https://placehold.co/180x260?text=No%20Image";
+
       return `
       <div class="pop-card" data-id="${m.id}">
         <img src="${imgUrl}" alt="${m.title}"/>
@@ -77,8 +73,9 @@ export function renderPopularList(category, movieArray) {
  */
 export function buildResultCard(m) {
   const posterUrl = m.poster_path
-    ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
-    : "https://via.placeholder.com/180x260?text=No+Image";
+  ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
+  : "https://placehold.co/180x260?text=No%20Image";
+
   const year = m.release_date?.slice(0, 4) || "";
   return `
   <div class="result-card" data-tmdb-id="${m.id}" data-year="${year}">
@@ -108,15 +105,19 @@ export function renderPager(current, total) {
   const prevDisabled = current === 1 ? 'disabled aria-disabled="true"' : "";
   const nextDisabled = current === total ? 'disabled aria-disabled="true"' : "";
   const html = `
-    <button ${prevDisabled} data-page="${current - 1}" aria-label="Previous page">Prev</button>
+    <button ${prevDisabled} data-page="${
+    current - 1
+  }" aria-label="Previous page">Prev</button>
     <span aria-live="polite">Page ${current} of ${total}</span>
-    <button ${nextDisabled} data-page="${current + 1}" aria-label="Next page">Next</button>`;
+    <button ${nextDisabled} data-page="${
+    current + 1
+  }" aria-label="Next page">Next</button>`;
   $("#pagination").html(html);
 }
 
 /**
  * renderFavoritesDropdown
- *   - Builds the favorites list in the dropdown based on localStorage. 
+ *   - Builds the favorites list in the dropdown based on localStorage.
  */
 export function renderFavoritesDropdown() {
   const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
