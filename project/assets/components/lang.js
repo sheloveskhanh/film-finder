@@ -1,3 +1,4 @@
+
 const translations = {
   en: {
     title: "Movie App",
@@ -61,10 +62,10 @@ const translations = {
     filterCountry: "País ▾",
     filterGenre: "Género ▾",
     filterClear: "Borrar filtros",
-    genreLabel:       "Género",
-    actorsLabel:      "Actores",
+    genreLabel: "Género",
+    actorsLabel: "Actores",
     releaseDateLabel: "Fecha de estreno",
-    imdbRatingLabel:  "Calificación IMDb",
+    imdbRatingLabel: "Calificación IMDb",
     descriptionLabel: "Descripción",
   },
   fr: {
@@ -90,13 +91,12 @@ const translations = {
     nowPlaying: "En salles",
     addFavorite: "Ajouter aux favoris",
     removeFavorite: "Supprimer des favoris",
-    genreLabel:       "Genre",
-    actorsLabel:      "Acteurs",
+    genreLabel: "Genre",
+    actorsLabel: "Acteurs",
     releaseDateLabel: "Date de sortie",
-    imdbRatingLabel:  "Note IMDb",
+    imdbRatingLabel: "Note IMDb",
     descriptionLabel: "Description",
   },
-
   de: {
     title: "Film-Explorer",
     bannerTitle: "Finden Sie Ihre nächste Filmobession",
@@ -120,10 +120,10 @@ const translations = {
     nowPlaying: "Jetzt im Kino",
     addFavorite: "Zu Favoriten hinzufügen",
     removeFavorite: "Aus Favoriten entfernen",
-    genreLabel:       "Genre",
-    actorsLabel:      "Schauspieler",
+    genreLabel: "Genre",
+    actorsLabel: "Schauspieler",
     releaseDateLabel: "Erscheinungsdatum",
-    imdbRatingLabel:  "IMDb-Bewertung",
+    imdbRatingLabel: "IMDb-Bewertung",
     descriptionLabel: "Beschreibung",
   },
 };
@@ -133,8 +133,23 @@ function applyTranslations(lang) {
     const key = $(this).data("i18n");
     $(this).text(translations[lang][key] || "");
   });
+
   $("[data-i18n-placeholder]").each(function () {
     const key = $(this).data("i18n-placeholder");
     $(this).attr("placeholder", translations[lang][key] || "");
   });
 }
+
+function applyFilterTranslations(lang) {
+  $("#sort-button").text(translations[lang].filterSortBy);
+  $("#country-button").text(translations[lang].filterCountry);
+  $("#genre-button-2").text(translations[lang].filterGenre);
+  $("#clear-filters").text(translations[lang].filterClear);
+}
+
+// Export everything that other modules (e.g. main.js) will need:
+export {
+  translations,
+  applyTranslations,
+  applyFilterTranslations,
+};
