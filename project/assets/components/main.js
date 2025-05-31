@@ -64,7 +64,6 @@ $(function () {
     { value: "original_title.asc", label: "Title (A–Z)" },
     { value: "vote_average.desc", label: "Highest Rated" },
     { value: "vote_average.asc", label: "Lowest Rated" },
-    { value: "vote_count.desc", label: "Most Rated" },
   ];
   sortOptions.forEach((o) =>
     $("#sort-list").append(`<li data-sort="${o.value}">${o.label}</li>`)
