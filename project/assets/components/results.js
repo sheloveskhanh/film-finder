@@ -10,7 +10,6 @@ export function Results(selector, onCardClick) {
     $results = $(selector);
     $pagination = $('<div id="pagination"></div>').insertAfter($results);
 
-    // Pagination button clicks
     $pagination.on('click', 'button', function() {
       const page = $(this).data('page');
       if (page) {
@@ -18,7 +17,6 @@ export function Results(selector, onCardClick) {
       }
     });
 
-    // Info icon click
     $results.on('click', '.info-icon', function(e) {
       e.stopPropagation();
       const id = $(this).closest('.result-card').data('id');
@@ -53,7 +51,6 @@ export function Results(selector, onCardClick) {
 
     $results.html(html);
 
-    // Render pagination
     let pagerHtml = '';
     for (let i = 1; i <= totalPages; i++) {
       pagerHtml += `<button data-page="${i}"${i === currentPage ? ' class="active"' : ''}>${i}</button>`;

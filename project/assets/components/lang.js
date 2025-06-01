@@ -1,4 +1,4 @@
-export const translations = {
+const translations = {
   en: {
     title: "Movie App",
     bannerTitle: "Find Your Next Movie Obsession",
@@ -16,6 +16,7 @@ export const translations = {
     clearFilters: "Clear Filters",
     topMovies: "Top Movies",
     incoming: "Incoming",
+    trendingLabel: "Trending",
     popularAllTime: "Popular All Time",
     nowPlaying: "Now Playing",
     themeToggle: "Toggle Theme",
@@ -50,6 +51,7 @@ export const translations = {
     clearFilters: "Limpiar filtros",
     topMovies: "Mejores Películas",
     incoming: "Próximas",
+    trendingLabel: "Tendencias",
     popularAllTime: "Populares de Siempre",
     nowPlaying: "En Cines",
     themeToggle: "Cambiar Tema",
@@ -61,10 +63,10 @@ export const translations = {
     filterCountry: "País ▾",
     filterGenre: "Género ▾",
     filterClear: "Borrar filtros",
-    genreLabel:       "Género",
-    actorsLabel:      "Actores",
+    genreLabel: "Género",
+    actorsLabel: "Actores",
     releaseDateLabel: "Fecha de estreno",
-    imdbRatingLabel:  "Calificación IMDb",
+    imdbRatingLabel: "Calificación IMDb",
     descriptionLabel: "Descripción",
   },
   fr: {
@@ -90,13 +92,12 @@ export const translations = {
     nowPlaying: "En salles",
     addFavorite: "Ajouter aux favoris",
     removeFavorite: "Supprimer des favoris",
-    genreLabel:       "Genre",
-    actorsLabel:      "Acteurs",
+    genreLabel: "Genre",
+    actorsLabel: "Acteurs",
     releaseDateLabel: "Date de sortie",
-    imdbRatingLabel:  "Note IMDb",
+    imdbRatingLabel: "Note IMDb",
     descriptionLabel: "Description",
   },
-
   de: {
     title: "Film-Explorer",
     bannerTitle: "Finden Sie Ihre nächste Filmobession",
@@ -120,21 +121,39 @@ export const translations = {
     nowPlaying: "Jetzt im Kino",
     addFavorite: "Zu Favoriten hinzufügen",
     removeFavorite: "Aus Favoriten entfernen",
-    genreLabel:       "Genre",
-    actorsLabel:      "Schauspieler",
+    genreLabel: "Genre",
+    actorsLabel: "Schauspieler",
     releaseDateLabel: "Erscheinungsdatum",
-    imdbRatingLabel:  "IMDb-Bewertung",
+    imdbRatingLabel: "IMDb-Bewertung",
     descriptionLabel: "Beschreibung",
   },
 };
 
-export function applyTranslations(lang) {
+function applyTranslations(lang) {
+
   $("[data-i18n]").each(function () {
     const key = $(this).data("i18n");
     $(this).text(translations[lang][key] || "");
   });
+
   $("[data-i18n-placeholder]").each(function () {
     const key = $(this).data("i18n-placeholder");
     $(this).attr("placeholder", translations[lang][key] || "");
   });
 }
+
+function applyFilterTranslations(lang) {
+  // Example: update a button’s text that wasn’t covered by data-i18n
+  // If you have elements like: <button id="sort-button">Sort by ▾</button>
+  // you could do:
+  $("#sort-button").text(translations[lang].filterSortBy);
+  $("#country-button").text(translations[lang].filterCountry);
+  $("#genre-button-2").text(translations[lang].filterGenre);
+  $("#clear-filters").text(translations[lang].filterClear);
+}
+
+export {
+  translations,
+  applyTranslations,
+  applyFilterTranslations,
+};
