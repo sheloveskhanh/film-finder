@@ -40,7 +40,6 @@ export async function fetchCountries() {
 }
 
 export async function searchMovies(query, uiPage = 1) {
-  // 1. First, fetch page=1 briefly to get total_pages
   const initial = await getJSON(endpoints.search, {
     api_key: TMDB_API_KEY,
     language: "en-US",

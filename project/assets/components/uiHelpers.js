@@ -32,7 +32,6 @@ export function renderPopularList(category, movieArray) {
     trending:   "#trending-list"
   };
 
-  // Build _up to 12 cards_. If you want more cards, just increase `.slice(0,12)` → e.g. `.slice(0,24)`:
   const html = movieArray
     .slice(0, 12)
     .map(m => {
@@ -47,7 +46,6 @@ export function renderPopularList(category, movieArray) {
     })
     .join("");
 
-  // Finally, inject into the correct “#…-list” container:
   $(containerMap[category]).html(html);
 }
 
@@ -55,17 +53,22 @@ export function renderPopularList(category, movieArray) {
 export function buildResultCard(m) {
   const posterUrl = m.poster_path
     ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
-    : "https://via.placeholder.com/180x260?text=No+Image";
+    : "assets/image/no-image.jpg";
+
   const year = m.release_date?.slice(0, 4) || "";
   return `
-  <div class="result-card" data-tmdb-id="${m.id}" data-year="${year}">
-    <img src="${posterUrl}" alt="${m.title} poster">
-    <div class="card-overlay"><span class="info-icon">ℹ️</span></div>
-    <div class="result-info">
-      <div class="title">${m.title} (${year})</div>
-      <button class="add-fav">${translations[currentLang].addFavorite}</button>
-    </div>
-  </div>`;
+    <div class="result-card" data-tmdb-id="${m.id}" data-year="${year}">
+      <img
+        src="${posterUrl}"
+        alt="${m.title} poster"
+        onerror="this.onerror=null; this.src='assets/image/no-image.jpg';"
+      >
+      <div class="card-overlay"><span class="info-icon">ℹ️</span></div>
+      <div class="result-info">
+        <div class="title">${m.title} (${year})</div>
+        <button class="add-fav">${translations[currentLang].addFavorite}</button>
+      </div>
+    </div>`;
 }
 
 export function renderResults(movieList) {

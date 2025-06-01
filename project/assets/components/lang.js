@@ -33,6 +33,10 @@ const translations = {
     releaseDateLabel: "Release Date",
     imdbRatingLabel: "IMDb Rating",
     descriptionLabel: "Description",
+     sortByLabel:        "Sort by ▾",
+    sortTitleAZ:        "Title (A–Z)",
+    sortHighestRated:   "Highest Rated",
+    sortLowestRated:    "Lowest Rated",
   },
   es: {
     title: "Explorador de Películas",
@@ -68,6 +72,10 @@ const translations = {
     releaseDateLabel: "Fecha de estreno",
     imdbRatingLabel: "Calificación IMDb",
     descriptionLabel: "Descripción",
+    sortByLabel:        "Ordenar ▾",
+    sortTitleAZ:        "Título (A–Z)",
+    sortHighestRated:   "Calificación más alta",
+    sortLowestRated:    "Calificación más baja",
   },
   fr: {
     title: "Explorateur de Films",
@@ -97,6 +105,10 @@ const translations = {
     releaseDateLabel: "Date de sortie",
     imdbRatingLabel: "Note IMDb",
     descriptionLabel: "Description",
+    sortByLabel:        "Trier ▾",
+    sortTitleAZ:        "Titre (A–Z)",
+    sortHighestRated:   "Mieux notés",
+    sortLowestRated:    "Moins notés",
   },
   de: {
     title: "Film-Explorer",
@@ -126,6 +138,10 @@ const translations = {
     releaseDateLabel: "Erscheinungsdatum",
     imdbRatingLabel: "IMDb-Bewertung",
     descriptionLabel: "Beschreibung",
+    sortByLabel:        "Sortieren ▾",
+    sortTitleAZ:        "Titel (A–Z)",
+    sortHighestRated:   "Bestbewertet",
+    sortLowestRated:    "Schlecht bewertet",
   },
 };
 

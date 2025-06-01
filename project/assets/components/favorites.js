@@ -1,4 +1,3 @@
-// assets/components/favorites.js
 
 import {
   renderFavoritesDropdown

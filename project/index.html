@@ -87,38 +87,41 @@
     </div>
   </div>
 
-    <section class="popular-section" id="popular-section">
-    <h2 data-i18n="browseTitle">Browse</h2>
+  <section class="popular-section" id="popular-section">
+  <h2 data-i18n="browseTitle">Browse</h2>
+  <div class="popular-tabs" id="popular-tabs"></div>
 
-    <div class="popular-tabs" id="popular-tabs">
-    </div>
+  <!-- Top Rated carousel -->
+  <div class="category-carousel" data-cat="topRated" style="display: none;">
+    <button id="topRated-prev"  class="carousel-nav">‹</button>
+    <div class="popular-list topRated-list" id="topRated-list"></div>
+    <button id="topRated-next"  class="carousel-nav">›</button>
+  </div>
 
-    <div class="category-carousel" data-cat="topRated" style="display:none;">
-      <button id="topRated-prev" class="carousel-nav">‹</button>
-      <div class="topRated-list" id="topRated-list"></div>
-      <button id="topRated-next" class="carousel-nav">›</button>
-    </div>
+  <!-- Upcoming carousel -->
+  <div class="category-carousel" data-cat="upcoming" style="display: none;">
+    <button id="upcoming-prev"  class="carousel-nav">‹</button>
+    <div class="popular-list upcoming-list" id="upcoming-list"></div>
+    <button id="upcoming-next"  class="carousel-nav">›</button>
+  </div>
 
-    <div class="category-carousel" data-cat="upcoming" style="display:none;">
-      <button id="upcoming-prev" class="carousel-nav">‹</button>
-      <div class="upcoming-list" id="upcoming-list"></div>
-      <button id="upcoming-next" class="carousel-nav">›</button>
-    </div>
+  <!-- Now Playing carousel -->
+  <div class="category-carousel" data-cat="nowPlaying" style="display: none;">
+    <button id="nowPlaying-prev" class="carousel-nav">‹</button>
+    <div class="popular-list nowPlaying-list" id="nowPlaying-list"></div>
+    <button id="nowPlaying-next" class="carousel-nav">›</button>
+  </div>
 
-    <div class="category-carousel" data-cat="nowPlaying" style="display:none;">
-      <button id="nowPlaying-prev" class="carousel-nav">‹</button>
-      <div class="nowPlaying-list" id="nowPlaying-list"></div>
-      <button id="nowPlaying-next" class="carousel-nav">›</button>
-    </div>
-
-    <div class="category-carousel" data-cat="trending" style="display:none;">
-      <button id="trending-prev" class="carousel-nav">‹</button>
-      <div class="trending-list" id="trending-list"></div>
-      <button id="trending-next" class="carousel-nav">›</button>
-    </div>
-  </section>
+  <!-- Trending carousel -->
+  <div class="category-carousel" data-cat="trending" style="display: none;">
+    <button id="trending-prev"   class="carousel-nav">‹</button>
+    <div class="popular-list trending-list" id="trending-list"></div>
+    <button id="trending-next"   class="carousel-nav">›</button>
+  </div>
+</section>
 
   <section id="results"></section>
+  <div id="pagination"></div>
 
   <div id="movie-modal" class="modal">
     <div class="modal-content"></div>
