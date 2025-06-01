@@ -1,24 +1,23 @@
-export const Search = function(){
-  let $input, $button;
-
-  function init() {
-    $input  = $('#search-input');
-    $button = $('#search-button');
-
-    $button.on('click', trigger);
-    $input.on('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        trigger();
-      }
-    });
-  }
+export function Search(inputSelector = "#search-input", buttonSelector = "#search-button", onSearch) {
+  const $input = $(inputSelector);
+  const $button = $(buttonSelector);
 
   function trigger() {
     const query = $input.val().trim();
-    $(document).trigger('search:changed', { query, page: 1 });
+    if (typeof onSearch === "function") {
+      onSearch(query);
+    } else {
+      // If using event-based approach:
+      $(document).trigger("search:changed", { query, page: 1 });
+    }
+  }
+
+  function init() {
+    $button.on("click", trigger);
+    $input.on("keypress", function (e) {
+      if (e.which === 13) trigger();
+    });
   }
 
   return { init };
-};
-
+}

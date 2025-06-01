@@ -1,69 +1,68 @@
-import {
-  POPULAR_URL,
-  TOP_RATED_URL,
-  UPCOMING_URL,
-  NOW_PLAYING_URL,
-  TMDB_API_KEY
-} from '../config/tmdb.js';
+import { translations } from "./lang.js";
 
-export function initPopular(tabsContainer, listContainer, onCardClick) {
-  tabsContainer.on('click', 'button', function() {
-    tabsContainer.find('button').removeClass('active');
-    $(this).addClass('active');
-    loadCategory($(this).data('cat'), listContainer);
-  });
+export function Results(selector, onCardClick) {
+  let $results;
+  let $pagination;
+  let currentPage = 1;
+  let totalPages = 1;
 
-  $('#popular-prev').on('click', () => {
-    listContainer.animate({ scrollLeft: `-=${listContainer.width()}` }, 400);
-  });
-  $('#popular-next').on('click', () => {
-    listContainer.animate({ scrollLeft: `+=${listContainer.width()}` }, 400);
-  });
+  function init() {
+    $results = $(selector);
+    $pagination = $('<div id="pagination"></div>').insertAfter($results);
 
-  listContainer.on('click', '.pop-card', function() {
-    onCardClick($(this).data('id'));
-  });
-  listContainer.on('click', '.info-icon', function(e) {
-    e.stopPropagation();
-    $(this).closest('.pop-card').trigger('click');
-  });
-}
+    // Pagination button clicks
+    $pagination.on('click', 'button', function() {
+      const page = $(this).data('page');
+      if (page) {
+        $(document).trigger('pager:changed', page);
+      }
+    });
 
-export function loadCategory(cat, listContainer) {
-  let url;
-  switch (cat) {
-    case 'top_rated':
-      url = TOP_RATED_URL;
-      break;
-    case 'upcoming':
-      url = UPCOMING_URL;
-      break;
-    case 'now_playing':
-      url = NOW_PLAYING_URL;
-      break;
-    default:
-      url = POPULAR_URL;
+    // Info icon click
+    $results.on('click', '.info-icon', function(e) {
+      e.stopPropagation();
+      const id = $(this).closest('.result-card').data('id');
+      if (typeof onCardClick === 'function') {
+        onCardClick(id);
+      }
+    });
+
+    // Add favorite click (optional, if you want to handle here)
+    // $results.on('click', '.add-fav', function(e) { ... });
   }
 
-  $.getJSON(url, {
-    api_key: TMDB_API_KEY,
-    language: 'en-US',
-    page: 1
-  }).done(resp => {
-    const html = resp.results
-      .slice(0, 12)
-      .map(m => {
-        const img = m.poster_path
-          ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
-          : 'https://via.placeholder.com/180x260?text=No+Image';
-        return `
-          <div class="pop-card" data-id="${m.id}">
-            <img src="${img}" alt="${m.title}">
-            <div class="card-overlay"><span class="info-icon">ℹ️</span></div>
+  function render(movies = [], page = 1, total = 1) {
+    currentPage = page;
+    totalPages = total;
+
+    const html = movies.map(movie => {
+      const posterUrl = movie.poster_path
+        ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+        : 'https://placehold.co/180x260?text=No+Image';
+
+      return `
+        <div class="result-card" data-id="${movie.imdb_id || movie.id}">
+          <div class="poster-container">
+            <img src="${posterUrl}" alt="${movie.title} Poster">
           </div>
-        `;
-      })
-      .join('');
-    listContainer.html(html);
-  });
+          <div class="card-details">
+            <h3 class="title">${movie.title} (${(movie.release_date||'').slice(0,4)})</h3>
+            <button class="add-fav">${translations[window.currentLang].addFavorite || "Add to Favorites"}</button>
+            <button class="info-icon">${translations[window.currentLang].moreInfo || "More Info"}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    $results.html(html);
+
+    // Render pagination (simple example)
+    let pagerHtml = '';
+    for (let i = 1; i <= totalPages; i++) {
+      pagerHtml += `<button data-page="${i}"${i === currentPage ? ' class="active"' : ''}>${i}</button>`;
+    }
+    $pagination.html(pagerHtml);
+  }
+
+  return { init, render };
 }

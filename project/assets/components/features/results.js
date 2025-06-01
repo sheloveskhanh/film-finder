@@ -1,65 +1,65 @@
 import { translations } from "./lang.js";
-import { Favorites } from "./favorites.js";
-import { renderPagination } from "./pagination.js";
-import { MovieModal } from "./modal.js";
 
-
-export const Results = function () {
-  let $results, $pagination;
+export function Results(selector, onCardClick) {
+  let $results;
+  let $pagination;
+  let currentPage = 1;
+  let totalPages = 1;
 
   function init() {
-    $results    = $('#results');
+    $results = $(selector);
     $pagination = $('<div id="pagination"></div>').insertAfter($results);
 
-    $pagination.on('click','button', function(){
+    // Pagination button clicks
+    $pagination.on('click', 'button', function() {
       const page = $(this).data('page');
       if (page) {
         $(document).trigger('pager:changed', page);
       }
     });
 
-    $results.on('click','.add-fav', function(e){
-      e.stopPropagation();
-      const $card = $(this).closest('.result-card');
-      const id    = $card.data('id');
-      const title = $card.find('.title').text();
-      Favorites.add({ imdbID:id, Title:title }, renderFavoritesDropdown);
-    });
-
+    // Info icon click
     $results.on('click', '.info-icon', function(e) {
       e.stopPropagation();
-      const $card = $(this).closest('.result-card');
-      const imdbID = $card.data('id');
-        console.log("Info icon clicked, imdbID:", imdbID);
-      $(document).trigger('card:clicked', imdbID);
+      const id = $(this).closest('.result-card').data('id');
+      if (typeof onCardClick === 'function') {
+        onCardClick(id);
+      }
     });
   }
 
-  function render(list, currentPage, totalPages) {
-    const html = list.map(m=>{
-      const poster = m.poster_path
-        ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
+  function render(movies = [], page = 1, total = 1) {
+    currentPage = page;
+    totalPages = total;
+
+    const html = movies.map(movie => {
+      const posterUrl = movie.poster_path
+        ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
         : 'https://placehold.co/180x260?text=No+Image';
+
       return `
-        <div class="result-card" data-id="${m.id}" data-year="${m.release_date?.slice(0,4)||''}">
-          <img src="${poster}" alt="${m.title} poster">
-          <div class="card-overlay"><span class="info-icon">ℹ️</span></div>
-          <div class="result-info">
-            <div class="title">${m.title} (${m.release_date?.slice(0,4)||''})</div>
-            <button class="add-fav">${translations[window.currentLang].addFavorite}</button>
+        <div class="result-card" data-id="${movie.imdb_id || movie.id}">
+          <div class="poster-container">
+            <img src="${posterUrl}" alt="${movie.title} Poster">
           </div>
-        </div>`;
+          <div class="card-details">
+            <h3 class="title">${movie.title} (${(movie.release_date||'').slice(0,4)})</h3>
+            <button class="add-fav">${translations[window.currentLang]?.addFavorite || "Add to Favorites"}</button>
+            <button class="info-icon">${translations[window.currentLang]?.moreInfo || "More Info"}</button>
+          </div>
+        </div>
+      `;
     }).join('');
+
     $results.html(html);
 
-    let ctrl = `<button ${currentPage===1?'disabled':''} data-page="${currentPage-1}">Prev</button>
-                <span class="page-info">Page <span class="current-page">${currentPage}</span> of ${totalPages}</span>
-                <button ${currentPage===totalPages?'disabled':''} data-page="${currentPage+1}">Next</button>`;
-    $pagination.html(ctrl);
+    // Render pagination
+    let pagerHtml = '';
+    for (let i = 1; i <= totalPages; i++) {
+      pagerHtml += `<button data-page="${i}"${i === currentPage ? ' class="active"' : ''}>${i}</button>`;
+    }
+    $pagination.html(pagerHtml);
   }
 
   return { init, render };
-};
-
-const results = Results();
-results.init();
+}
