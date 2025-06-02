@@ -1,8 +1,6 @@
 // project/assets/components/modal.js
 
-import { translations } from "./lang.js";
-
-export const MovieModal = (function () {
+export const MovieModal = (function() {
   const $modal     = $('#movie-modal');
   const $container = $modal.find('.modal-content');
   let lastData = null; // Tracks what was last shown (full OMDB or TMDB‐only)

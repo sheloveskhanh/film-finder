@@ -1,4 +1,4 @@
-const Favorites = (function() {
+export function Favorites() {
   const STORAGE_KEY = 'favorites';
 
   function load() {
@@ -38,4 +38,4 @@ const Favorites = (function() {
   }
 
   return { render, add, remove };
-})();
+}

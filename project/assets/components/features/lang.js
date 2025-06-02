@@ -1,5 +1,4 @@
-
-const translations = {
+export const translations = {
   en: {
     title: "Movie App",
     bannerTitle: "Find Your Next Movie Obsession",
@@ -128,7 +127,7 @@ const translations = {
   },
 };
 
-function applyTranslations(lang) {
+export function applyTranslations(lang) {
   $("[data-i18n]").each(function () {
     const key = $(this).data("i18n");
     $(this).text(translations[lang][key] || "");
