@@ -80,21 +80,7 @@
   position: relative;
 }
 
-.carousel-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  background: #23455f;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
-  z-index: 10;
-  border-radius: 50%;
-  line-height: 1;
-}
+
 #popular-prev { left: 0.25rem; }
 #popular-next { right: 0.25rem; }
 
@@ -132,4 +118,48 @@
 .popular-list {
   position: relative;
   z-index: 1;
+}
+
+.category-carousel {
+  display: flex;
+  align-items: center;      
+  margin-top: 1rem;        
+}
+
+.category-carousel .carousel-nav {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;          
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  height: 6rem;           
+  width: 2.5rem;            
+  margin: 0 0.5rem;       
+  border-radius: 0.25rem;
+}
+
+
+.category-carousel .popular-list {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  flex-grow: 1;             
+}
+
+.category-carousel .popular-list::-webkit-scrollbar {
+  display: none;
+}
+.category-carousel .popular-list {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;    
+}
+
+.category-carousel .pop-card {
+  flex: 0 0 auto;
+  margin-right: 1rem;       
 }
