@@ -138,3 +138,37 @@
 .pop-card:hover .info-icon {
   transform: scale(1.2);
 }
+
+#pagination button {
+  margin: 0 4px;
+  padding: 6px 10px;
+  font-size: 14px;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #333333;
+}
+
+#pagination button:hover,
+#pagination button:focus {
+  background-color: #f0f0f0;
+  outline: none;
+}
+
+#pagination button:disabled,
+#pagination button[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#pagination button.active {
+  background-color: #007bff;     
+  border-color: #007bff;
+  color: #ffffff;
+}
+
+#pagination button.active:hover,
+#pagination button.active:focus {
+  background-color: #0056b3;  
+}

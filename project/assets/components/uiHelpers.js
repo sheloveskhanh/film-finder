@@ -5,7 +5,9 @@ export function buildGenreListItem(genre) {
 }
 
 export function buildCountryListItem(country) {
-  return $(`<li data-code="${country.iso_3166_1}">${country.english_name}</li>`);
+  return $(
+    `<li data-code="${country.iso_3166_1}">${country.english_name}</li>`
+  );
 }
 
 export function buildSortOptionItem(option) {
@@ -26,15 +28,15 @@ export function renderBrowseTabs(tabs) {
 
 export function renderPopularList(category, movieArray) {
   const containerMap = {
-    topRated:   "#topRated-list",
-    upcoming:   "#upcoming-list",
+    topRated: "#topRated-list",
+    upcoming: "#upcoming-list",
     nowPlaying: "#nowPlaying-list",
-    trending:   "#trending-list"
+    trending: "#trending-list",
   };
 
   const html = movieArray
     .slice(0, 12)
-    .map(m => {
+    .map((m) => {
       const imgUrl = m.poster_path
         ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
         : "https://via.placeholder.com/180x260?text=No+Image";
@@ -49,7 +51,6 @@ export function renderPopularList(category, movieArray) {
   $(containerMap[category]).html(html);
 }
 
-
 export function buildResultCard(m) {
   const posterUrl = m.poster_path
     ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
@@ -57,7 +58,7 @@ export function buildResultCard(m) {
 
   const year = m.release_date?.slice(0, 4) || "";
   return `
-    <div class="result-card" data-tmdb-id="${m.id}" data-year="${year}">
+   <div class="result-card" data-id="${m.id}" data-year="${year}">
       <img
         src="${posterUrl}"
         alt="${m.title} poster"
@@ -77,14 +78,25 @@ export function renderResults(movieList) {
 }
 
 export function renderPager(current, total) {
-  const prevDisabled = current === 1 ? 'disabled aria-disabled="true"' : "";
-  const nextDisabled = current === total ? 'disabled aria-disabled="true"' : "";
-  const html = `
-    <button ${prevDisabled} data-page="${current - 1}" aria-label="Previous page">Prev</button>
-    <span aria-live="polite">Page ${current} of ${total}</span>
-    <button ${nextDisabled} data-page="${current + 1}" aria-label="Next page">Next</button>`;
+  let html = "";
+
+  if (current > 1) {
+    html += `<button data-page="${current - 1}">Prev</button>`;
+  } else {
+    html += `<button disabled>Prev</button>`;
+  }
+
+  html += `<span>Page ${current} of ${total}</span>`;
+
+  if (current < total) {
+    html += `<button data-page="${current + 1}">Next</button>`;
+  } else {
+    html += `<button disabled>Next</button>`;
+  }
+
   $("#pagination").html(html);
 }
+
 
 export function renderFavoritesDropdown() {
   const favs = JSON.parse(localStorage.getItem("favorites") || "[]");

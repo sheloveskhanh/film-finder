@@ -1,4 +1,3 @@
-
 import { translations } from "./lang.js";
 import { Favorites } from "./favorites.js";
 
@@ -10,16 +9,8 @@ export function Results(selector, onCardClick) {
 
   function init() {
     $results = $(selector);
-    $pagination = $('<div id="pagination"></div>').insertAfter($results);
 
-    $pagination.on("click", "button", function() {
-      const page = $(this).data("page");
-      if (page) {
-        $(document).trigger("pager:changed", page);
-      }
-    });
-
-    $results.on("click", ".info-icon", function(e) {
+    $results.on("click", ".info-icon", function (e) {
       e.stopPropagation();
       const id = $(this).closest(".result-card").data("id");
       if (typeof onCardClick === "function") {
@@ -27,11 +18,11 @@ export function Results(selector, onCardClick) {
       }
     });
 
-    $results.on("click", ".add-fav", function(e) {
+    $results.on("click", ".add-fav", function (e) {
       e.stopPropagation();
-      const $card   = $(this).closest(".result-card");
-      const imdbID  = $card.data("id");
-      const title   = $card.data("title");
+      const $card = $(this).closest(".result-card");
+      const imdbID = $card.data("id");
+      const title = $card.data("title");
 
       if (!imdbID || !title) {
         alert("Unable to add to favorites right now. Please try again.");
@@ -42,6 +33,8 @@ export function Results(selector, onCardClick) {
         Favorites.render();
       });
     });
+
+    $pagination = $("#pagination");
   }
 
   function render(movies = [], page = 1, total = 1) {
@@ -57,8 +50,10 @@ export function Results(selector, onCardClick) {
 
         const year = movie.release_date ? movie.release_date.slice(0, 4) : "";
 
-        const addFavLabel = translations[window.currentLang]?.addFavorite || "Add to Favorites";
-        const infoLabel   = translations[window.currentLang]?.moreInfo    || "More Info";
+        const addFavLabel =
+          translations[window.currentLang]?.addFavorite || "Add to Favorites";
+        const infoLabel =
+          translations[window.currentLang]?.moreInfo || "More Info";
 
         return `
           <div 
@@ -82,16 +77,15 @@ export function Results(selector, onCardClick) {
       .join("");
 
     $results.html(html);
-
     let pagerHtml = "";
     for (let i = 1; i <= totalPages; i++) {
       pagerHtml += `
-        <button 
-          data-page="${i}" 
-          ${i === currentPage ? 'class="active"' : ""}
-        >
-          ${i}
-        </button>`;
+    <button 
+      data-page="${i}" 
+      ${i === currentPage ? 'class="active"' : ""}
+    >
+      ${i}
+    </button>`;
     }
     $pagination.html(pagerHtml);
   }

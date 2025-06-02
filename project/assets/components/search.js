@@ -1,13 +1,22 @@
-// search.js
+// assets/components/search.js
 
-import { searchMovies, discoverMovies, getMovieDetails } from "./tmdbServices.js";
-import { renderResults, renderPager }                              from "./uiHelpers.js";
-import { MovieModal }                                               from "./modal.js";
-import { filterState }                                              from "./filters.js";
+import {
+  searchMovies,
+  discoverMovies,
+  getMovieDetails,
+} from "./tmdbServices.js";
+
+import {
+  renderResults,
+  renderPager
+} from "./uiHelpers.js";
+
+import { MovieModal } from "./modal.js";
+import { filterState } from "./filters.js";
 
 const OMDB_API_URL = "https://www.omdbapi.com/";
-const OMDB_API_KEY = "375878b3";
-const YT_API_KEY   = "AIzaSyDnDJkjOBT2Ruj9jW88J9BIZHJuwnMlI3c";
+const OMDB_API_KEY = "375878b3";  
+const YT_API_KEY   = "AIzaSyDnDJkjOBT2Ruj9jW88J9BIZHJuwnMlI3c";     
 
 const movieDetailsCache = {};
 const trailerCache      = {};
@@ -18,7 +27,7 @@ export function initSearch() {
     reloadResults();
   });
 
-  $("#search-input").on("keydown", e => {
+  $("#search-input").on("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       filterState.page = 1;
@@ -34,17 +43,21 @@ export function initSearch() {
   });
 
   $("#pagination").on("click", "button", function() {
-    const p = $(this).data("page");
-    if (p) {
-      filterState.page = p;
-      reloadResults();
-    }
+  if ($(this).is(":disabled")) return;
+  const p = $(this).data("page");
+  if (typeof p !== "undefined") {
+    filterState.page = Number(p);
+    reloadResults();
+  }
   });
+  
 
   $("#results").on("click", ".result-card", async function(e) {
     if ($(e.target).is(".add-fav")) return;
-    const tmdbId = $(this).attr("data-tmdb-id");
-results
+
+    const tmdbId = $(this).data("id");
+    let detail;
+
     if (movieDetailsCache[tmdbId]) {
       detail = movieDetailsCache[tmdbId];
     } else {
@@ -52,7 +65,8 @@ results
       try {
         detail = await getMovieDetails(tmdbId);
         movieDetailsCache[tmdbId] = detail;
-      } catch {
+      } catch (err) {
+        console.error("TMDB detail fetch failed:", err);
         MovieModal.showError("Could not load movie details.");
         return;
       }
@@ -60,17 +74,21 @@ results
 
     const imdbID = detail.external_ids?.imdb_id;
     if (!imdbID) {
-      MovieModal.showTMDBOnly(detail);
+      if (MovieModal.showTMDBOnly) {
+        MovieModal.showTMDBOnly(detail);
+      } else {
+        MovieModal.showError("IMDb ID not found for this movie.");
+      }
       return;
     }
 
     MovieModal.showLoading();
-
     try {
       const omdbData = await fetchOMDB(imdbID);
       const { videoId, embeddable } = await fetchYouTubeTrailer(omdbData.Title);
       MovieModal.show(omdbData, videoId, embeddable);
-    } catch {
+    } catch (err) {
+      console.error("OMDB/YouTube fetch failed:", err);
       MovieModal.showError("Failed to load movie details. Please try again later.");
     }
   });
@@ -88,7 +106,6 @@ export async function reloadResults() {
 
   $("#popular-section").toggle(!q && !hasFilters);
   $("#results").empty();
-  $("#pagination").empty();
 
   try {
     if (q) {
@@ -96,39 +113,42 @@ export async function reloadResults() {
       renderResults(movies);
       renderPager(filterState.page, totalPages);
       annotateTmdbDetails(movies);
-    } else if (hasFilters) {
+    }
+    else if (hasFilters) {
       const { movies, totalPages } = await discoverMovies(filterState, filterState.page);
       renderResults(movies);
       renderPager(filterState.page, totalPages);
       annotateTmdbDetails(movies);
     }
-  } catch {
+  }
+  catch (err) {
+    console.error("Error during reloadResults():", err);
     MovieModal.showError("Couldn't load results. Please try again.");
   }
 }
 
 export function annotateTmdbDetails(movieArray) {
-  movieArray.forEach(async m => {
+  movieArray.forEach(async (m) => {
     if (movieDetailsCache[m.id]) {
-      attachDataAttributes(m.id, movieDetailsCache[m.id]);
+      applyFiltersToCard(m.id, movieDetailsCache[m.id]);
       return;
     }
     try {
       const detail = await getMovieDetails(m.id);
       movieDetailsCache[m.id] = detail;
-      attachDataAttributes(m.id, detail);
-    } catch {
-      // Skip on failure
+      applyFiltersToCard(m.id, detail);
+    } catch (err) {
+      console.error(`Could not fetch details for TMDB ID ${m.id}:`, err);
     }
   });
 }
 
-function attachDataAttributes(tmdbId, detail) {
-  const $card = $(`#results .result-card[data-tmdb-id="${tmdbId}"]`);
+function applyFiltersToCard(tmdbId, detail) {
+  const $card = $(`#results .result-card[data-id="${tmdbId}"]`);
   if (!$card.length) return;
 
-  const genres  = detail.genres.map(g => g.name).join(", ");
-  const country = detail.production_countries.map(c => c.name).join(", ");
+  const genres = detail.genres.map((g) => g.name).join(", ");
+  const country = detail.production_countries.map((c) => c.name).join(", ");
 
   $card
     .attr("data-genre", genres)
@@ -136,6 +156,49 @@ function attachDataAttributes(tmdbId, detail) {
     .attr("data-rating", detail.vote_average)
     .attr("data-votes", detail.vote_count)
     .attr("data-imdb-id", detail.external_ids?.imdb_id || "");
+
+  const yearFrom    = filterState.yearFrom;
+  const yearTo      = filterState.yearTo;
+  const countryCode = filterState.country;
+  const reqGenres   = filterState.genres.map((id) => id); 
+
+  let ok = true;
+  const cardYear = parseInt($card.attr("data-year"), 10);
+  if (yearFrom && cardYear < yearFrom) ok = false;
+  if (yearTo   && cardYear > yearTo)   ok = false;
+
+  if (countryCode) {
+    const mc = ($card.attr("data-country") || "").split(",").map((s) => s.trim());
+    if (!mc.includes(countryCode)) ok = false;
+  }
+
+  if (reqGenres.length) {
+    const mg = ($card.attr("data-genre") || "").split(",").map((s) => s.trim());
+    if (!reqGenres.every((g) => mg.includes(g))) ok = false;
+  }
+
+  $card.toggle(ok);
+
+  if (filterState.sortBy) {
+    const visible = $("#results .result-card:visible").toArray();
+    visible.sort((a, b) => {
+      const $A = $(a),
+            $B = $(b);
+      switch (filterState.sortBy) {
+        case "original_title.asc":
+          return $A.find(".title").text().localeCompare($B.find(".title").text());
+        case "vote_average.desc":
+          return parseFloat($B.attr("data-rating")) - parseFloat($A.attr("data-rating"));
+        case "vote_average.asc":
+          return parseFloat($A.attr("data-rating")) - parseFloat($B.attr("data-rating"));
+        case "vote_count.desc":
+          return parseInt($B.attr("data-votes"), 10) - parseInt($A.attr("data-votes"), 10);
+        default:
+          return 0;
+      }
+    });
+    $("#results").append(visible);
+  }
 }
 
 async function fetchOMDB(imdbID) {
@@ -143,8 +206,8 @@ async function fetchOMDB(imdbID) {
     $.getJSON(
       OMDB_API_URL,
       { apikey: OMDB_API_KEY, i: imdbID, plot: "full" },
-      md => resolve(md)
-    ).fail((_, __, err) => reject(err));
+      (md) => resolve(md)
+    ).fail((_, status, err) => reject(err));
   });
 }
 
@@ -164,8 +227,8 @@ async function fetchYouTubeTrailer(title) {
         q: query,
         key: YT_API_KEY,
       },
-      ytData => resolve(ytData)
-    ).fail((_, __, err) => reject(err));
+      (ytData) => resolve(ytData)
+    ).fail((_, status, err) => reject(err));
   });
 
   const videoId = ytSearch.items?.[0]?.id.videoId || null;
@@ -176,8 +239,8 @@ async function fetchYouTubeTrailer(title) {
       $.getJSON(
         "https://www.googleapis.com/youtube/v3/videos",
         { part: "status", id: videoId, key: YT_API_KEY },
-        sd => resolve(sd)
-      ).fail((_, __, err) => reject(err));
+        (sd) => resolve(sd)
+      ).fail((_, status, err) => reject(err));
     });
     embeddable = statusData.items?.[0]?.status.embeddable || false;
   }

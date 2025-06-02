@@ -64,7 +64,7 @@ export const MovieModal = (function() {
 
     const posterSrc = movie.Poster && movie.Poster !== 'N/A'
       ? movie.Poster
-      : '../assets/no-image.png';
+      : 'assets/image/no-image.jpg';
 
     const trailerSection = buildTrailerSection(trailerId, embeddable);
 
@@ -77,7 +77,7 @@ export const MovieModal = (function() {
           <img
             src="${posterSrc}"
             alt="${movie.Title} Poster"
-            onerror="this.onerror=null; this.src='../assets/no-image.png';"
+            onerror="this.onerror=null; this.src='assets/image/no-image.jpg';"
             style="width:160px; object-fit:cover;"
           >
         </div>
@@ -136,7 +136,7 @@ export const MovieModal = (function() {
     const t = translations[window.currentLang] || {};
     const posterSrc = detail.poster_path
       ? `https://image.tmdb.org/t/p/w342${detail.poster_path}`
-      : "../assets/no-image.png";
+      : "assets/image/no-image.jpg";
 
     const html = `
       <div class="modal-header">
@@ -147,7 +147,7 @@ export const MovieModal = (function() {
           <img
             src="${posterSrc}"
             alt="${detail.title} Poster"
-            onerror="this.onerror=null;this.src='../assets/no-image.png';"
+            onerror="this.onerror=null;this.src='assets/image/no-image.jpg';"
             style="width:160px; object-fit:cover;"
           >
         </div>
