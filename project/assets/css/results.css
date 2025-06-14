@@ -139,36 +139,49 @@
   transform: scale(1.2);
 }
 
+/* e.g. in your base.css or results.css */
+#pagination {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 8px 0;
+  gap: 4px;
+  justify-content: center;
+}
+
+/* Make buttons a bit bigger and inline-block so they don’t collapse */
 #pagination button {
-  margin: 0 4px;
-  padding: 6px 10px;
+  flex: 0 0 auto;
+  min-width: 36px;
+  padding: 6px 8px;
   font-size: 14px;
-  background-color: #ffffff;
-  border: 1px solid #cccccc;
   border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
   cursor: pointer;
-  color: #333333;
 }
 
-#pagination button:hover,
-#pagination button:focus {
-  background-color: #f0f0f0;
-  outline: none;
+#pagination button.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: #fff;
+  cursor: default;
 }
 
-#pagination button:disabled,
-#pagination button[aria-disabled="true"] {
+#pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-#pagination button.active {
-  background-color: #007bff;     
-  border-color: #007bff;
-  color: #ffffff;
+#pagination:empty {
+  display: none;
 }
 
-#pagination button.active:hover,
-#pagination button.active:focus {
-  background-color: #0056b3;  
+#pagination .ellipsis {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 16px;
+  color: #777;
 }

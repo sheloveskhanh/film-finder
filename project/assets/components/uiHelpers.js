@@ -77,25 +77,48 @@ export function renderResults(movieList) {
   $("#results").html(html);
 }
 
+// in uiHelpers.js
 export function renderPager(current, total) {
   let html = "";
 
-  if (current > 1) {
-    html += `<button data-page="${current - 1}">Prev</button>`;
-  } else {
-    html += `<button disabled>Prev</button>`;
+  // Prev
+  html += current > 1
+    ? `<button data-page="${current - 1}">Prev</button>`
+    : `<button disabled>Prev</button>`;
+
+  // Build a reduced list of page numbers + "…"
+  const delta = 2;
+  const pages = [];
+  for (let i = 1; i <= total; i++) {
+    // always show first 2 or last 2 pages
+    if (i <= 2 || i > total - 2 ||
+        // or within current±delta
+        (i >= current - delta && i <= current + delta)) {
+      pages.push(i);
+    } else if (pages[pages.length - 1] !== "...") {
+      pages.push("...");
+    }
   }
 
-  html += `<span>Page ${current} of ${total}</span>`;
+  // Render those
+  pages.forEach(p => {
+    if (p === "...") {
+      html += `<span class="ellipsis">…</span>`;
+    } else if (p === current) {
+      html += `<button class="active" disabled>${p}</button>`;
+    } else {
+      html += `<button data-page="${p}">${p}</button>`;
+    }
+  });
 
-  if (current < total) {
-    html += `<button data-page="${current + 1}">Next</button>`;
-  } else {
-    html += `<button disabled>Next</button>`;
-  }
+  // Next
+  html += current < total
+    ? `<button data-page="${current + 1}">Next</button>`
+    : `<button disabled>Next</button>`;
 
   $("#pagination").html(html);
 }
+
 
 
 export function renderFavoritesDropdown() {

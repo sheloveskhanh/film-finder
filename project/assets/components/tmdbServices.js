@@ -55,6 +55,7 @@ export async function searchMovies(query, uiPage = 1) {
 
   const startTmdb = (currentUi - 1) * PAGES_PER_UI_PAGE + 1;
   const endTmdb = Math.min(startTmdb + PAGES_PER_UI_PAGE - 1, totalTmdPages);
+  
 
   const fetchPromises = [];
   for (let p = startTmdb; p <= endTmdb; p++) {
@@ -88,60 +89,41 @@ export async function searchMovies(query, uiPage = 1) {
   };
 }
 
-
-
 export async function discoverMovies(filterState, uiPage = 1) {
-  const baseParams = new URLSearchParams({
+
+  const baseParams = {
     api_key: TMDB_API_KEY,
     language: "en-US",
-    sort_by: filterState.sortBy || "popularity.desc",
-    include_adult: "false",
-  });
+    sort_by: filterState.sortBy     || "popularity.desc",
+    include_adult: false,
+    ...(filterState.yearFrom ? { "primary_release_date.gte": `${filterState.yearFrom}-01-01` } : {}),
+    ...(filterState.yearTo   ? { "primary_release_date.lte": `${filterState.yearTo}-12-31` } : {}),
+    ...(filterState.genres.length   ? { with_genres: filterState.genres.join(",") } : {}),
+    ...(filterState.country         ? { region: filterState.country } : {}),
+  };
 
-  if (filterState.yearFrom) {
-    baseParams.set("primary_release_date.gte", `${filterState.yearFrom}-01-01`);
-  }
-  if (filterState.yearTo) {
-    baseParams.set("primary_release_date.lte", `${filterState.yearTo}-12-31`);
-  }
-  if (filterState.genres.length) {
-    baseParams.set("with_genres", filterState.genres.join(","));
-  }
-  if (filterState.country) {
-    baseParams.set("region", filterState.country);
-  }
+  const first = await getJSON(endpoints.discover, { ...baseParams, page: 1 });
+  const totalTmdPages = first.total_pages;
+  const totalUIPages  = Math.ceil(totalTmdPages / PAGES_PER_UI_PAGE);
 
-  baseParams.set("page", 1);
-  const initial = await getJSON(`${endpoints.discover}?${baseParams.toString()}`);
-  const totalTmdPages = initial.total_pages;
-  const totalUIPages = Math.ceil(totalTmdPages / PAGES_PER_UI_PAGE);
   const currentUi = Math.min(Math.max(uiPage, 1), totalUIPages);
-  const startTmdb = (currentUi - 1) * PAGES_PER_UI_PAGE + 1;
-  const endTmdb = Math.min(startTmdb + PAGES_PER_UI_PAGE - 1, totalTmdPages);
 
-  const fetchPromises = [];
+  const startTmdb = (currentUi - 1) * PAGES_PER_UI_PAGE + 1;
+  const endTmdb   = Math.min(startTmdb + PAGES_PER_UI_PAGE - 1, totalTmdPages);
+
+  const promises = [];
   for (let p = startTmdb; p <= endTmdb; p++) {
-    baseParams.set("page", p);
-    const url = `${endpoints.discover}?${baseParams.toString()}`;
-    fetchPromises.push(
-      fetch(url).then((res) => {
-        if (!res.ok) throw new Error(`TMDB discover (page ${p}) failed: ${res.status}`);
-        return res.json();
-      })
+    promises.push(
+      getJSON(endpoints.discover, { ...baseParams, page: p })
     );
   }
+  const pagesData = await Promise.all(promises);
 
-  const resultsArr = await Promise.all(fetchPromises);
-
-  let combined = [];
-  for (const pageResp of resultsArr) {
-    combined = combined.concat(pageResp.results);
-  }
+  const allMovies = pagesData.flatMap((pg) => pg.results);
 
   return {
-    movies: combined,
-    totalPages: totalUIPages,
-    totalResults: initial.total_results,
+    movies:     allMovies,    
+    totalPages: totalUIPages,  
   };
 }
 

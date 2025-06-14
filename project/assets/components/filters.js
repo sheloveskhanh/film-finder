@@ -13,32 +13,23 @@ export let filterState = {
   page:     1,  
 };
 
-// These two maps get populated by main.js on startup (so that the filter‐labels can show “Country: X” and “Genre: Y”).
 export let genreRev   = {};
 export let countryMap = {};
 
-/**
- * Populates the “Sort by” dropdown (<ul id="sort-list">) and updates the button text.
- * Reads labels from translations[currentLang].
- */
+
 function buildSortMenu() {
-  // 1) Change the “#sort-button” label to whatever the current language’s key is:
   $("#sort-button").text(translations[window.currentLang].sortByLabel);
 
-  // 2) Empty out any existing <li> children; we will re‐append fresh ones:
   $("#sort-list").empty();
 
-  // 3) Build an array of options, each with { value, label } taken from translations:
   const options = [
     { value: "original_title.asc", label: translations[window.currentLang].sortTitleAZ },
     { value: "vote_average.desc", label: translations[window.currentLang].sortHighestRated },
     { value: "vote_average.asc", label: translations[window.currentLang].sortLowestRated },
   ];
 
-  // 4) Append each <li> into #sort-list (we assume buildSortOptionItem just does `<li data-sort="...">label</li>`).
   options.forEach(opt => {
-    // We’ll build a small jQuery element by hand to avoid having to import buildSortOptionItem here.
-    // If you already have a helper, you can replace the next two lines with that helper.
+ 
     const $li = $(`<li data-sort="${opt.value}">${opt.label}</li>`);
     $("#sort-list").append($li);
   });

@@ -1,9 +1,9 @@
-// assets/components/search.js
+// project/assets/components/search.js
 
 import {
   searchMovies,
   discoverMovies,
-  getMovieDetails,
+  getMovieDetails
 } from "./tmdbServices.js";
 
 import {
@@ -12,11 +12,11 @@ import {
 } from "./uiHelpers.js";
 
 import { MovieModal } from "./modal.js";
-import { filterState } from "./filters.js";
+import { filterState, genreRev, countryMap } from "./filters.js";
 
 const OMDB_API_URL = "https://www.omdbapi.com/";
-const OMDB_API_KEY = "375878b3";  
-const YT_API_KEY   = "AIzaSyDnDJkjOBT2Ruj9jW88J9BIZHJuwnMlI3c";     
+const OMDB_API_KEY = "375878b3";
+const YT_API_KEY   = "AIzaSyDnDJkjOBT2Ruj9jW88J9BIZHJuwnMlI3c";
 
 const movieDetailsCache = {};
 const trailerCache      = {};
@@ -37,23 +37,21 @@ export function initSearch() {
 
   $("#search-input").on("input", function() {
     if (!$(this).val().trim()) {
-      $("#results").empty();
-      $("#pagination").empty();
+      $("#results, #pagination").empty();
     }
   });
 
   $("#pagination").on("click", "button", function() {
-  if ($(this).is(":disabled")) return;
-  const p = $(this).data("page");
-  if (typeof p !== "undefined") {
-    filterState.page = Number(p);
-    reloadResults();
-  }
+    if ($(this).is(":disabled")) return;
+    const p = $(this).data("page");
+    if (typeof p !== "undefined") {
+      filterState.page = Number(p);
+      reloadResults();
+    }
   });
-  
 
   $("#results").on("click", ".result-card", async function(e) {
-    if ($(e.target).is(".add-fav")) return;
+    if ($(e.target).is(".add-fav")) return; 
 
     const tmdbId = $(this).data("id");
     let detail;
@@ -74,11 +72,9 @@ export function initSearch() {
 
     const imdbID = detail.external_ids?.imdb_id;
     if (!imdbID) {
-      if (MovieModal.showTMDBOnly) {
-        MovieModal.showTMDBOnly(detail);
-      } else {
-        MovieModal.showError("IMDb ID not found for this movie.");
-      }
+      MovieModal.showTMDBOnly
+        ? MovieModal.showTMDBOnly(detail)
+        : MovieModal.showError("IMDb ID not found for this movie.");
       return;
     }
 
@@ -106,6 +102,7 @@ export async function reloadResults() {
 
   $("#popular-section").toggle(!q && !hasFilters);
   $("#results").empty();
+  $("#pagination").empty();
 
   try {
     if (q) {
@@ -114,18 +111,20 @@ export async function reloadResults() {
       renderPager(filterState.page, totalPages);
       annotateTmdbDetails(movies);
     }
-    else if (hasFilters) {
-      const { movies, totalPages } = await discoverMovies(filterState, filterState.page);
+     else if (hasFilters) {
+      const { movies, totalPages } = 
+        await discoverMovies(filterState, filterState.page);
       renderResults(movies);
       renderPager(filterState.page, totalPages);
       annotateTmdbDetails(movies);
     }
-  }
-  catch (err) {
+  } catch (err) {
     console.error("Error during reloadResults():", err);
     MovieModal.showError("Couldn't load results. Please try again.");
   }
 }
+
+
 
 export function annotateTmdbDetails(movieArray) {
   movieArray.forEach(async (m) => {
@@ -160,7 +159,7 @@ function applyFiltersToCard(tmdbId, detail) {
   const yearFrom    = filterState.yearFrom;
   const yearTo      = filterState.yearTo;
   const countryCode = filterState.country;
-  const reqGenres   = filterState.genres.map((id) => id); 
+  const reqGenres   = filterState.genres.map((id) => genreRev[id]);
 
   let ok = true;
   const cardYear = parseInt($card.attr("data-year"), 10);
@@ -168,12 +167,16 @@ function applyFiltersToCard(tmdbId, detail) {
   if (yearTo   && cardYear > yearTo)   ok = false;
 
   if (countryCode) {
-    const mc = ($card.attr("data-country") || "").split(",").map((s) => s.trim());
-    if (!mc.includes(countryCode)) ok = false;
+    const mc = ($card.attr("data-country") || "")
+      .split(",")
+      .map((s) => s.trim());
+    if (!mc.includes(countryMap[countryCode])) ok = false;
   }
 
   if (reqGenres.length) {
-    const mg = ($card.attr("data-genre") || "").split(",").map((s) => s.trim());
+    const mg = ($card.attr("data-genre") || "")
+      .split(",")
+      .map((s) => s.trim());
     if (!reqGenres.every((g) => mg.includes(g))) ok = false;
   }
 
@@ -182,8 +185,7 @@ function applyFiltersToCard(tmdbId, detail) {
   if (filterState.sortBy) {
     const visible = $("#results .result-card:visible").toArray();
     visible.sort((a, b) => {
-      const $A = $(a),
-            $B = $(b);
+      const $A = $(a), $B = $(b);
       switch (filterState.sortBy) {
         case "original_title.asc":
           return $A.find(".title").text().localeCompare($B.find(".title").text());
@@ -207,7 +209,7 @@ async function fetchOMDB(imdbID) {
       OMDB_API_URL,
       { apikey: OMDB_API_KEY, i: imdbID, plot: "full" },
       (md) => resolve(md)
-    ).fail((_, status, err) => reject(err));
+    ).fail((_, __, err) => reject(err));
   });
 }
 
@@ -228,19 +230,18 @@ async function fetchYouTubeTrailer(title) {
         key: YT_API_KEY,
       },
       (ytData) => resolve(ytData)
-    ).fail((_, status, err) => reject(err));
+    ).fail((_, __, err) => reject(err));
   });
 
   const videoId = ytSearch.items?.[0]?.id.videoId || null;
   let embeddable = false;
-
   if (videoId) {
     const statusData = await new Promise((resolve, reject) => {
       $.getJSON(
         "https://www.googleapis.com/youtube/v3/videos",
         { part: "status", id: videoId, key: YT_API_KEY },
         (sd) => resolve(sd)
-      ).fail((_, status, err) => reject(err));
+      ).fail((_, __, err) => reject(err));
     });
     embeddable = statusData.items?.[0]?.status.embeddable || false;
   }
