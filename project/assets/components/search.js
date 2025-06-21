@@ -1,5 +1,3 @@
-// project/assets/components/search.js
-
 import {
   searchMovies,
   discoverMovies,
@@ -20,6 +18,7 @@ const YT_API_KEY   = "AIzaSyDnDJkjOBT2Ruj9jW88J9BIZHJuwnMlI3c";
 
 const movieDetailsCache = {};
 const trailerCache      = {};
+const $searchInput = $("#search-input");
 
 export function initSearch() {
   $("#search-button").on("click", () => {
@@ -91,7 +90,7 @@ export function initSearch() {
 }
 
 export async function reloadResults() {
-  const q = $("#search-input").val().trim();
+  const q          = $searchInput.val().trim();
   const hasFilters = Boolean(
     filterState.yearFrom ||
     filterState.yearTo   ||
@@ -105,26 +104,28 @@ export async function reloadResults() {
   $("#pagination").empty();
 
   try {
-    if (q) {
-      const { movies, totalPages } = await searchMovies(q, filterState.page);
-      renderResults(movies);
-      renderPager(filterState.page, totalPages);
-      annotateTmdbDetails(movies);
-    }
-     else if (hasFilters) {
-      const { movies, totalPages } = 
+    if (hasFilters) {
+      const { movies, totalPages } =
         await discoverMovies(filterState, filterState.page);
+
+      renderResults(movies);
+      renderPager(filterState.page, totalPages);
+      annotateTmdbDetails(movies);
+
+    } else if (q) {
+      const { movies, totalPages } =
+        await searchMovies(q, filterState.page);
+
       renderResults(movies);
       renderPager(filterState.page, totalPages);
       annotateTmdbDetails(movies);
     }
+
   } catch (err) {
     console.error("Error during reloadResults():", err);
     MovieModal.showError("Couldn't load results. Please try again.");
   }
 }
-
-
 
 export function annotateTmdbDetails(movieArray) {
   movieArray.forEach(async (m) => {

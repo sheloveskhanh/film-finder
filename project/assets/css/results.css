@@ -32,10 +32,6 @@
   transition: transform 0.3s ease;
 }
 
-.result-card:hover img {
-  transform: scale(1.05);
-}
-
 .result-info {
   flex: 1;
   padding: 0.75rem;
@@ -139,7 +135,6 @@
   transform: scale(1.2);
 }
 
-/* e.g. in your base.css or results.css */
 #pagination {
   display: flex;
   flex-wrap: nowrap;
@@ -149,7 +144,6 @@
   justify-content: center;
 }
 
-/* Make buttons a bit bigger and inline-block so they don’t collapse */
 #pagination button {
   flex: 0 0 auto;
   min-width: 36px;

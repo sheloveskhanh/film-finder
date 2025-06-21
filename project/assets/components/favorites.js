@@ -1,4 +1,3 @@
-
 import {
   renderFavoritesDropdown
 } from "./uiHelpers.js";

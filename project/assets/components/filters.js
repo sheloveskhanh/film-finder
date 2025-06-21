@@ -1,9 +1,5 @@
-// filters.js
-
 import { applyFilterTranslations, translations } from "./lang.js";
 
-// Export an object to keep track of all filter‐state.
-// Other modules (e.g. search.js) may read filterState.* to know how to query TMDB.
 export let filterState = {
   yearFrom: null,
   yearTo:   null,
@@ -35,23 +31,13 @@ function buildSortMenu() {
   });
 }
 
-/**
- * Whenever the user clicks on “Sort by ▾” or picks one of the <li> items,
- * we update filterState.sortBy and then invoke onFiltersChangedCallback().
- */
 export function initFilters(onFiltersChangedCallback) {
-  // First, populate the sort menu in the initial language:
   buildSortMenu();
 
-  // Whenever the user clicks anywhere outside a dropdown, close all dropdown‐menus:
   function closeAllDropdowns() {
     $(".dropdown-menu").hide();
   }
   $(document).on("click", closeAllDropdowns);
-
-  // ─────────────────────────────────────────────
-  // Year‐range inputs:
-  // ─────────────────────────────────────────────
   $("#year-from, #year-to").on("input", () => {
     filterState.yearFrom = parseInt($("#year-from").val()) || null;
     filterState.yearTo   = parseInt($("#year-to").val())   || null;
@@ -59,9 +45,6 @@ export function initFilters(onFiltersChangedCallback) {
     onFiltersChangedCallback();
   });
 
-  // ─────────────────────────────────────────────
-  // Sort‐by button & list clicks
-  // ─────────────────────────────────────────────
   $("#sort-button").on("click", e => {
     e.stopPropagation();
     closeAllDropdowns();
@@ -135,7 +118,6 @@ export function initFilters(onFiltersChangedCallback) {
     onFiltersChangedCallback();
   });
 }
-
 
 export function translateFilters() {
   buildSortMenu();

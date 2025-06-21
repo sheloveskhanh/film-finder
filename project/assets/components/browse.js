@@ -1,5 +1,3 @@
-// assets/components/browse.js
-
 import { fetchCategory, fetchTrending } from "./tmdbServices.js";
 import { renderBrowseTabs, renderPopularList } from "./uiHelpers.js";
 import { translations } from "./lang.js";
