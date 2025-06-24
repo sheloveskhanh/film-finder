@@ -58,7 +58,7 @@ export function buildResultCard(m) {
 
   const year = m.release_date?.slice(0, 4) || "";
   return `
-   <div class="result-card" data-id="${m.id}" data-year="${year}">
+   <div class="result-card" data-id="${m.id}" data-title="${m.title.replace(/"/g, "&quot;")}" data-year="${year}">
       <img
         src="${posterUrl}"
         alt="${m.title} poster"
@@ -67,32 +67,26 @@ export function buildResultCard(m) {
       <div class="card-overlay"><span class="info-icon">ℹ️</span></div>
       <div class="result-info">
         <div class="title">${m.title} (${year})</div>
-        <button class="add-fav">${translations[currentLang].addFavorite}</button>
+        <button class="add-fav"><span style="margin-right:6px;">❤️</span>${translations[currentLang].addFavorite}</button>
       </div>
     </div>`;
 }
-
 export function renderResults(movieList) {
   const html = movieList.map((m) => buildResultCard(m)).join("");
   $("#results").html(html);
 }
 
-// in uiHelpers.js
 export function renderPager(current, total) {
   let html = "";
 
-  // Prev
   html += current > 1
     ? `<button data-page="${current - 1}">Prev</button>`
     : `<button disabled>Prev</button>`;
 
-  // Build a reduced list of page numbers + "…"
   const delta = 2;
   const pages = [];
   for (let i = 1; i <= total; i++) {
-    // always show first 2 or last 2 pages
     if (i <= 2 || i > total - 2 ||
-        // or within current±delta
         (i >= current - delta && i <= current + delta)) {
       pages.push(i);
     } else if (pages[pages.length - 1] !== "...") {
@@ -100,7 +94,6 @@ export function renderPager(current, total) {
     }
   }
 
-  // Render those
   pages.forEach(p => {
     if (p === "...") {
       html += `<span class="ellipsis">…</span>`;
@@ -111,7 +104,6 @@ export function renderPager(current, total) {
     }
   });
 
-  // Next
   html += current < total
     ? `<button data-page="${current + 1}">Next</button>`
     : `<button disabled>Next</button>`;
@@ -119,20 +111,16 @@ export function renderPager(current, total) {
   $("#pagination").html(html);
 }
 
-
-
 export function renderFavoritesDropdown() {
   const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-  if (!favs.length) {
-    $("#favorites-list").html("<li>(no favorites yet)</li>");
-  } else {
-    const html = favs
-      .map(
-        (m) =>
-          `<li data-id="${m.imdbID}"><span>${m.Title}</span>` +
-          `<button class="remove-fav">&times;</button></li>`
-      )
-      .join("");
-    $("#favorites-list").html(html);
-  }
+  const $list = $("#favorites-list").empty();
+  favs.forEach(f => {
+    $list.append(`
+      <li data-id="${f.imdbID}">
+        ${f.Title || ""} (${f.Year || ""})
+        <button class="remove-fav">×</button>
+      </li>
+    `);
+  });
 }
+

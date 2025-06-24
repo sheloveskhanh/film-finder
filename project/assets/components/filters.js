@@ -5,11 +5,12 @@ export let filterState = {
   yearTo:   null,
   sortBy:   null,
   country:  null,
-  genres:   [],
-  page:     1,  
+  genres: [],
+  page: 1,
+  perPage: 20,
 };
 
-export let genreRev   = {};
+export let genreRev = {};
 export let countryMap = {};
 
 
@@ -38,10 +39,17 @@ export function initFilters(onFiltersChangedCallback) {
     $(".dropdown-menu").hide();
   }
   $(document).on("click", closeAllDropdowns);
+
+  $("#per-page-select").on("change", function(e) {
+    filterState.perPage = parseInt($(this).val(), 10) || 20;
+    filterState.page    = 1;        
+    onFiltersChangedCallback();
+  });
+
   $("#year-from, #year-to").on("input", () => {
     filterState.yearFrom = parseInt($("#year-from").val()) || null;
-    filterState.yearTo   = parseInt($("#year-to").val())   || null;
-    filterState.page     = 1;
+    filterState.yearTo = parseInt($("#year-to").val()) || null;
+    filterState.page = 1;
     onFiltersChangedCallback();
   });
 

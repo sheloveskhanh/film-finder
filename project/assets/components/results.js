@@ -20,17 +20,19 @@ export function Results(selector, onCardClick) {
 
     $results.on("click", ".add-fav", function (e) {
       e.stopPropagation();
+      e.preventDefault();
       const $card = $(this).closest(".result-card");
       const imdbID = $card.data("id");
       const title = $card.data("title");
-
+      const year = $card.data("year"); // <-- get the year
       if (!imdbID || !title) {
         alert("Unable to add to favorites right now. Please try again.");
         return;
       }
 
-      Favorites.add({ imdbID, Title: title }, () => {
+      Favorites.add({ imdbID, Title: title, Year: year }, () => { 
         Favorites.render();
+        showToast("Added to your favorites! ⭐");
       });
     });
 
@@ -81,13 +83,26 @@ export function Results(selector, onCardClick) {
     for (let i = 1; i <= totalPages; i++) {
       pagerHtml += `
     <button 
-      data-page="${i}" 
-      ${i === currentPage ? 'class="active"' : ""}
     >
       ${i}
     </button>`;
     }
     $pagination.html(pagerHtml);
+  }
+
+  function showToast(message, duration = 2000) {
+    const $toast = $(`
+      <div class="toast-message" style="
+        background: #333; color: #fff; padding: 12px 24px; border-radius: 6px;
+        margin-top: 10px; min-width: 180px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        opacity: 0.95; font-size: 1rem;">
+        ${message}
+      </div>
+    `);
+    $("#toast-container").append($toast);
+    setTimeout(() => {
+      $toast.fadeOut(400, () => $toast.remove());
+    }, duration);
   }
 
   return { init, render };
