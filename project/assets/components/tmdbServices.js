@@ -1,9 +1,12 @@
-// project/assets/components/tmdbService.js
-
+// Constants
 const TMDB_API_URL = "https://api.themoviedb.org/3";
-const TMDB_API_KEY = "36b0465246018e127b54bfa7d47d965c";
+const TMDB_API_KEY = "36b0465246018e127b54bfa7d47d965c"; // Should be moved to environment variables
 const PAGES_PER_UI_PAGE = 3;
+const DEFAULT_LANGUAGE = "en-US";
+const MAX_RETRIES = 2;
+const RETRY_DELAY = 1000; // 1 second
 
+// Endpoints
 const endpoints = {
   search: `${TMDB_API_URL}/search/movie`,
   discover: `${TMDB_API_URL}/discover/movie`,
@@ -13,161 +16,192 @@ const endpoints = {
   topRated: `${TMDB_API_URL}/movie/top_rated`,
   upcoming: `${TMDB_API_URL}/movie/upcoming`,
   nowPlaying: `${TMDB_API_URL}/movie/now_playing`,
+  trending: `${TMDB_API_URL}/trending/movie/day`,
   details: (tmdbId) => `${TMDB_API_URL}/movie/${tmdbId}`,
 };
 
+// Helper function with retry logic
+async function fetchWithRetry(url, params = {}, retries = MAX_RETRIES) {
+  try {
+    const queryString = new URLSearchParams({
+      api_key: TMDB_API_KEY,
+      language: DEFAULT_LANGUAGE,
+      ...params
+    }).toString();
+    const fullUrl = `${url}?${queryString}`;
 
-
-function getJSON(url, params = {}) {
-  return new Promise((resolve, reject) => {
-    $.getJSON(url, params)
-      .done((data) => resolve(data))
-      .fail((jqXhr, status, err) => {
-        console.error("TMDB request failed:", status, err);
-        reject(err);
-      });
-  });
+    const response = await fetch(fullUrl);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    if (retries > 0) {
+      console.warn(`Retrying (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})...`);
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return fetchWithRetry(url, params, retries - 1);
+    }
+    throw new Error(`Failed after ${MAX_RETRIES} attempts: ${error.message}`);
+  }
 }
 
+// Base API function with caching
+const apiCache = new Map();
+async function getJSON(url, params = {}) {
+  const cacheKey = `${url}?${new URLSearchParams(params).toString()}`;
+  
+  if (apiCache.has(cacheKey)) {
+    return apiCache.get(cacheKey);
+  }
+
+  try {
+    const data = await fetchWithRetry(url, params);
+    apiCache.set(cacheKey, data);
+    return data;
+  } catch (error) {
+    console.error("TMDB request failed:", error);
+    throw error;
+  }
+}
+
+// Genre and country services
 export async function fetchGenres() {
-  const resp = await getJSON(endpoints.genreList, { api_key: TMDB_API_KEY });
-  return resp.genres;
+  try {
+    const resp = await getJSON(endpoints.genreList);
+    return resp.genres || [];
+  } catch (error) {
+    console.error("Failed to fetch genres:", error);
+    return [];
+  }
 }
 
 export async function fetchCountries() {
-  const list = await getJSON(endpoints.countryConfig, { api_key: TMDB_API_KEY });
-  return list;
+  try {
+    return await getJSON(endpoints.countryConfig);
+  } catch (error) {
+    console.error("Failed to fetch countries:", error);
+    return [];
+  }
 }
 
-export async function searchMovies(query, uiPage = 1) {
-  const initial = await getJSON(endpoints.search, {
-    api_key: TMDB_API_KEY,
-    language: "en-US",
-    query: query,
-    include_adult: false,
-    page: 1,
-  });
-  const totalTmdPages = initial.total_pages;
-
+// Search and discover with pagination
+async function fetchPaginatedResults(endpoint, params, uiPage = 1) {
+  // Get first page to determine total pages
+  const firstPage = await getJSON(endpoint, { ...params, page: 1 });
+  const totalTmdPages = firstPage.total_pages || 1;
   const totalUIPages = Math.ceil(totalTmdPages / PAGES_PER_UI_PAGE);
-
   const currentUi = Math.min(Math.max(uiPage, 1), totalUIPages);
 
-  const startTmdb = (currentUi - 1) * PAGES_PER_UI_PAGE + 1;
-  const endTmdb = Math.min(startTmdb + PAGES_PER_UI_PAGE - 1, totalTmdPages);
-  
+  // Calculate page range to fetch
+  const startPage = (currentUi - 1) * PAGES_PER_UI_PAGE + 1;
+  const endPage = Math.min(startPage + PAGES_PER_UI_PAGE - 1, totalTmdPages);
 
-  const fetchPromises = [];
-  for (let p = startTmdb; p <= endTmdb; p++) {
-    fetchPromises.push(
-      fetch(
-        `${endpoints.search}?` +
-          new URLSearchParams({
-            api_key: TMDB_API_KEY,
-            language: "en-US",
-            query: query,
-            include_adult: "false",
-            page: p,
-          }).toString()
-      ).then((res) => {
-        if (!res.ok) throw new Error(`TMDB search (page ${p}) failed: ${res.status}`);
-        return res.json();
-      })
-    );
+  // Fetch pages in parallel
+  const promises = [];
+  for (let p = startPage; p <= endPage; p++) {
+    promises.push(getJSON(endpoint, { ...params, page: p }));
   }
 
-  const resultsArr = await Promise.all(fetchPromises);
+  const pages = await Promise.all(promises);
+  const movies = pages.flatMap(pg => pg.results || []);
 
-  let combined = [];
-  for (const pageResp of resultsArr) {
-    combined = combined.concat(pageResp.results);
-  }
   return {
-    movies: combined,            
-    totalPages: totalUIPages,   
-    totalResults: initial.total_results,
+    movies,
+    totalPages: totalUIPages,
+    totalResults: firstPage.total_results || 0
   };
+}
+
+export async function searchMovies(query, uiPage = 1, perPage = 20) {
+  if (!query || typeof query !== 'string') {
+    throw new Error("Invalid search query");
+  }
+
+  return fetchPaginatedResults(endpoints.search, {
+    query: encodeURIComponent(query.trim()),
+    include_adult: false,
+  }, uiPage);
 }
 
 export async function discoverMovies(filterState, uiPage = 1) {
-
   const baseParams = {
-    api_key: TMDB_API_KEY,
-    language: "en-US",
-    sort_by: filterState.sortBy     || "popularity.desc",
+    sort_by: filterState.sortBy || "popularity.desc",
     include_adult: false,
-    ...(filterState.yearFrom ? { "primary_release_date.gte": `${filterState.yearFrom}-01-01` } : {}),
-    ...(filterState.yearTo   ? { "primary_release_date.lte": `${filterState.yearTo}-12-31` } : {}),
-    ...(filterState.genres.length   ? { with_genres: filterState.genres.join(",") } : {}),
-    ...(filterState.country         ? { region: filterState.country } : {}),
+    ...(filterState.yearFrom && { "primary_release_date.gte": `${filterState.yearFrom}-01-01` }),
+    ...(filterState.yearTo && { "primary_release_date.lte": `${filterState.yearTo}-12-31` }),
+    ...(filterState.genres?.length && { with_genres: filterState.genres.join(",") }),
+    ...(filterState.country && { region: filterState.country }),
   };
 
-  const first = await getJSON(endpoints.discover, { ...baseParams, page: 1 });
-  const totalTmdPages = first.total_pages;
-  const totalUIPages  = Math.ceil(totalTmdPages / PAGES_PER_UI_PAGE);
-
-  const currentUi = Math.min(Math.max(uiPage, 1), totalUIPages);
-
-  const startTmdb = (currentUi - 1) * PAGES_PER_UI_PAGE + 1;
-  const endTmdb   = Math.min(startTmdb + PAGES_PER_UI_PAGE - 1, totalTmdPages);
-
-  const promises = [];
-  for (let p = startTmdb; p <= endTmdb; p++) {
-    promises.push(
-      getJSON(endpoints.discover, { ...baseParams, page: p })
-    );
-  }
-  const pagesData = await Promise.all(promises);
-
-  const allMovies = pagesData.flatMap((pg) => pg.results);
-
-  return {
-    movies:     allMovies,    
-    totalPages: totalUIPages,  
-  };
+  return fetchPaginatedResults(endpoints.discover, baseParams, uiPage);
 }
 
+// Movie details
 export async function getMovieDetails(tmdbId) {
-  const url = endpoints.details(tmdbId);
-  const params = {
-    api_key: TMDB_API_KEY,
-    language: "en-US",
-    append_to_response: "external_ids",
-  };
-  const detail = await getJSON(url, params);
-  return detail;
+  if (!tmdbId || isNaN(tmdbId)) {
+    throw new Error("Invalid TMDB ID");
+  }
+
+  try {
+    return await getJSON(endpoints.details(tmdbId), {
+      append_to_response: "external_ids,credits,videos"
+    });
+  } catch (error) {
+    console.error(`Failed to fetch details for movie ${tmdbId}:`, error);
+    throw error;
+  }
 }
 
+// Category fetchers
 export async function fetchTrending() {
-  const url = `${TMDB_API_URL}/trending/movie/day`;
-  const response = await fetch(`${url}?api_key=${TMDB_API_KEY}&language=en-US&page=1`);
-  if (!response.ok) {
-    throw new Error(`TMDB trending fetch failed: ${response.status}`);
+  try {
+    const resp = await getJSON(endpoints.trending);
+    return resp.results || [];
+  } catch (error) {
+    console.error("Failed to fetch trending movies:", error);
+    return [];
   }
-  const data = await response.json();
-  return data.results;
 }
 
 export async function fetchCategory(category) {
-  let url;
-  switch (category) {
-    case "topRated":
-      url = endpoints.topRated;
-      break;
-    case "upcoming":
-      url = endpoints.upcoming;
-      break;
-    case "nowPlaying":
-      url = endpoints.nowPlaying;
-      break;
-    case "popular":
-    default:
-      url = endpoints.popular;
+  const endpointMap = {
+    popular: endpoints.popular,
+    topRated: endpoints.topRated,
+    upcoming: endpoints.upcoming,
+    nowPlaying: endpoints.nowPlaying
+  };
+
+  const endpoint = endpointMap[category];
+  if (!endpoint) {
+    throw new Error(`Invalid category: ${category}`);
   }
-  const resp = await getJSON(url, {
-    api_key: TMDB_API_KEY,
-    language: "en-US",
-    page: 1,
-  });
-  return resp.results;
+
+  try {
+    const resp = await getJSON(endpoint);
+    return resp.results || [];
+  } catch (error) {
+    console.error(`Failed to fetch ${category} movies:`, error);
+    return [];
+  }
+}
+
+// Cache management
+export function clearCache() {
+  apiCache.clear();
+}
+
+// Rate limiting helper
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 200; // 200ms between requests
+
+async function rateLimitedFetch(url, options) {
+  const now = Date.now();
+  const timeSinceLast = now - lastRequestTime;
+  
+  if (timeSinceLast < MIN_REQUEST_INTERVAL) {
+    await new Promise(resolve => 
+      setTimeout(resolve, MIN_REQUEST_INTERVAL - timeSinceLast)
+    );
+  }
+  
+  lastRequestTime = Date.now();
+  return fetch(url, options);
 }

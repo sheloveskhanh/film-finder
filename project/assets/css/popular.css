@@ -163,3 +163,60 @@
   flex: 0 0 auto;
   margin-right: 1rem;       
 }
+
+/* Base button style */
+.add-fav {
+  position: relative;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+/* Hover effect */
+.add-fav:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #fad0c4 0%, #ff9a9e 100%);
+}
+
+/* Active/pressed effect */
+.add-fav:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}
+
+/* Star icon */
+.add-fav::before {
+  content: "★";
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+/* Already favorited state */
+.add-fav.favorited {
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+.add-fav.favorited::before {
+  content: "⭐";
+  animation: pulse 0.5s ease;
+}
+
+/* Pulse animation for feedback */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}

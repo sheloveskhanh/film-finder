@@ -6,7 +6,8 @@ export let filterState = {
   sortBy:   null,
   country:  null,
   genres:   [],
-  page:     1,  
+  page: 1, 
+  perPage:  20, 
 };
 
 export let genreRev   = {};
@@ -45,6 +46,12 @@ export function initFilters(onFiltersChangedCallback) {
     onFiltersChangedCallback();
   });
 
+  $("#per-page-select").on("change", e => {
+    filterState.perPage = Number(e.target.value);
+    filterState.page    = 1;
+    onFiltersChangedCallback();
+  });
+  
   $("#sort-button").on("click", e => {
     e.stopPropagation();
     closeAllDropdowns();
