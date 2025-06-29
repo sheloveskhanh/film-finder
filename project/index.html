@@ -31,9 +31,15 @@
         <option value="de">Deutsch</option>
       </select>
 
-      <div class="favorites-dropdown">
-        <button id="favorites-button">★</button>
-        <ul id="favorites-list" class="dropdown-content"></ul>
+      <div class="favorites-wrapper">
+        <button id="favorites-button" class="btn-favorites">
+          <span class="icon">★</span>
+          <span class="text">Favorites</span>
+          <span id="favorites-count" class="count">0</span>
+        </button>
+        <div id="favorites-dropdown">
+          <ul id="favorites-list"></ul>
+        </div>
       </div>
     </div>
   </nav>
@@ -53,6 +59,16 @@
   <div class="search-section">
     <input id="search-input" type="text" placeholder="Search for movies..." data-i18n-placeholder="searchPlaceholder" />
     <button id="search-button" data-i18n="search">Search</button>
+  </div>
+
+  <div class="filter-item">
+    <label for="per-page-select">Show</label>
+    <select id="per-page-select">
+      <option value="20">20</option>
+      <option value="40">40</option>
+      <option value="60">60</option>
+    </select>
+    <span>per page</span>
   </div>
 
   <div class="filters">
@@ -91,19 +107,37 @@
 
 
   <section class="popular-section" id="popular-section">
-    <h2>Browse</h2>
+    <h2 data-i18n="browseTitle">Browse</h2>
     <div class="popular-tabs" id="popular-tabs"></div>
 
-    <div class="popular-carousel">
-      <button id="popular-prev" class="carousel-nav">‹</button>
-      <div class="popular-list" id="popular-list"></div>
-      <button id="popular-next" class="carousel-nav">›</button>
+    <div class="category-carousel" data-cat="topRated" style="display: none;">
+      <button id="topRated-prev" class="carousel-nav">‹</button>
+      <div class="popular-list topRated-list" id="topRated-list"></div>
+      <button id="topRated-next" class="carousel-nav">›</button>
+    </div>
+
+    <div class="category-carousel" data-cat="upcoming" style="display: none;">
+      <button id="upcoming-prev" class="carousel-nav">‹</button>
+      <div class="popular-list upcoming-list" id="upcoming-list"></div>
+      <button id="upcoming-next" class="carousel-nav">›</button>
+    </div>
+
+    <div class="category-carousel" data-cat="nowPlaying" style="display: none;">
+      <button id="nowPlaying-prev" class="carousel-nav">‹</button>
+      <div class="popular-list nowPlaying-list" id="nowPlaying-list"></div>
+      <button id="nowPlaying-next" class="carousel-nav">›</button>
+    </div>
+
+    <div class="category-carousel" data-cat="trending" style="display: none;">
+      <button id="trending-prev" class="carousel-nav">‹</button>
+      <div class="popular-list trending-list" id="trending-list"></div>
+      <button id="trending-next" class="carousel-nav">›</button>
     </div>
   </section>
 
-  <ul id="suggestions" class="suggestions"></ul>
-
   <section id="results"></section>
+
+  <div id="pagination"></div>
 
   <div id="movie-modal" class="modal">
     <div class="modal-content"></div>
@@ -112,11 +146,8 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="module" src="assets/components/main.js"></script>
 
-<<<<<<< HEAD
-=======
 
   <script type="module" src="assets/components/main.js"></script>
->>>>>>> 856ec88e97df4ed690834a7a86757b2ea08afb1c
 </body>
 
 </html>

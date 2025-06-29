@@ -1,90 +1,109 @@
-import { Filters } from "./features/filters.js";
-import { Favorites } from "./features/favorites.js";
-import { Results } from "./features/results.js";
-import { MovieModal } from "./features/modal.js";
-import { Search } from "./features/search.js";
-import { applyTranslations } from "./features/lang.js";
-import { fetchSearchResults, fetchMovieDetails } from "./features/tmdbServices.js";
-import { initPopular } from "./features/popular.js";
+import { reloadResults, initSearch } from "./search.js";
+import { initBrowse, translateBrowseTabs } from "./browse.js";
+import { initFilters, filterState, genreRev, countryMap } from "./filters.js";
+import { Favorites } from "./favorites.js";
+import { applyTranslations } from "./lang.js";
+import { MovieModal } from "./modal.js";
+import { fetchGenres, fetchCountries } from "./tmdbServices.js";
+import { Results } from "./results.js";
+import { buildGenreListItem, buildCountryListItem } from "./uiHelpers.js";
 
-$(function () {
-  window.currentLang = "en";
+$(function() {
+  // Initialize language
+  window.currentLang = localStorage.getItem("language") || "en";
   applyTranslations(window.currentLang);
 
-  // State
-  let filterState = {
-    yearFrom: null,
-    yearTo: null,
-    sortBy: null,
-    country: null,
-    genres: [],
-    page: 1,
-    query: "",
-  };
+  // Load initial data
+  (async function loadInitialData() {
+    const genres = await fetchGenres();
+    genres.forEach(g => {
+      genreRev[g.id] = g.name;
+      $("#genre-list-2").append(buildGenreListItem(g));
+    });
 
-  const genreRev = {};
-  const countryMap = {};
+    const countries = await fetchCountries();
+    countries.forEach(c => {
+      countryMap[c.iso_3166_1] = c.english_name;
+      $("#country-list").append(buildCountryListItem(c));
+    });
+  })();
 
-  $.getJSON("https://api.themoviedb.org/3/genre/movie/list", { api_key: "36b0465246018e127b54bfa7d47d965c" }).done(
-    (resp) => {
-      resp.genres.forEach((g) => {
-        genreRev[g.id] = g.name;
-        $("#genre-list-2").append(`<li data-id="${g.id}">${g.name}</li>`);
-      });
+  // Initialize filters
+  initFilters(() => {
+    filterState.page = 1;
+    reloadResults();
+  });
 
-      $.getJSON("https://api.themoviedb.org/3/configuration/countries", {
-        api_key: "36b0465246018e127b54bfa7d47d965c",
-      }).done((list) => {
-        list.forEach((c) => {
-          countryMap[c.iso_3166_1] = c.english_name;
-          $("#country-list").append(
-            `<li data-code="${c.iso_3166_1}">${c.english_name}</li>`
-          );
-        });
+  // Category display
+  function showOnlyCategory(catKey) {
+    $(".category-carousel").hide();
+    $(`.category-carousel[data-cat="${catKey}"]`).show();
+  }
+  initBrowse(showOnlyCategory);
+  initSearch();
 
-        // Initialize components
-        const movieModal = MovieModal;
-        Favorites(filterState, reload);
-
-        const results = Results("#results", imdbID => {
-          fetchMovieDetails(imdbID).then(({ data, trailerId, embeddable }) => {
-            movieModal.show(data, trailerId, embeddable);
-          });
-        });
-        results.init();
-
-        Filters({ filterState, genreRev, countryMap, reload });
-
-        const search = Search("#search-input", "#search-button", query => {
-          filterState.query = query;
-          filterState.page = 1;
-          reload();
-        });
-        search.init();
-
-        // Language switch
-        $("#language-switch").on("change", function () {
-          window.currentLang = this.value;
-          applyTranslations(window.currentLang);
-          reload();
-        });
-
-        // Main reload function
-        function reload() {
-          fetchSearchResults(filterState).then(({ movies, totalPages }) => {
-            results.render(movies, filterState.page, totalPages);
-            // Optionally, update favorites or other UI here
-          });
-        }
-
-        reload();
-
-        initPopular($("#popular-tabs"), $("#popular-list"), (tmdbId) => {
-          fetchMovieDetails(tmdbId).then(({ data, trailerId, embeddable }) => {
-            movieModal.show(data, trailerId, embeddable);
-          });
-        });
-      });
+  // Favorites dropdown
+  $("#favorites-button").on("click", e => {
+    e.stopPropagation();
+    $(".favorites-dropdown").toggleClass("open");
+    if ($(".favorites-dropdown").hasClass("open")) {
+      Favorites.render();
     }
-  );
+  });
+  
+  $(document).on("click", e => {
+    if (!$(e.target).closest(".favorites-dropdown").length && 
+        !$(e.target).is("#favorites-button")) {
+      $(".favorites-dropdown").removeClass("open");
+    }
+  });
+
+  // Remove favorites
+  $("#favorites-list").on("click", ".remove-fav", function(e) {
+    e.stopPropagation();
+    const imdbID = $(this).closest("li").data("id");
+    Favorites.remove(imdbID);
+  });
+
+  // Initialize modal
+  MovieModal.init();
+
+  // Fixed language switch
+  $("#language-switch").on("change", function(e) {
+    e.stopPropagation();
+    window.currentLang = this.value;
+    localStorage.setItem("language", window.currentLang);
+    applyTranslations(window.currentLang);
+    translateBrowseTabs(showOnlyCategory);
+    
+    const activeCat = $("#popular-tabs button.active").data("cat") || "topRated";
+    showOnlyCategory(activeCat);
+    
+    Favorites.render();
+    
+    if ($searchInput.val().trim()) {
+      reloadResults();
+    }
+    
+    if (MovieModal.rerender) {
+      MovieModal.rerender();
+    }
+  });
+
+  // Results component
+  const resultsComponent = Results("#results", movieId => {
+    MovieModal.showByTmdbId(movieId);
+  });
+  resultsComponent.init();
+
+  // Initialize first category
+  $(".category-carousel").hide();
+  showOnlyCategory("topRated");
+
+  // Movies per page selector
+  $("#per-page-selector").on("change", function() {
+    filterState.perPage = parseInt($(this).val());
+    filterState.page = 1;
+    reloadResults();
+  });
 });

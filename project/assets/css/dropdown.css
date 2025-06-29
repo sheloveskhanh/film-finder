@@ -98,3 +98,7 @@
 .dropdown-menu li:hover {
   background: #f0f0f0;
 }
+
+.dropdown-menu li.active {
+    background: #709fc8;
+}

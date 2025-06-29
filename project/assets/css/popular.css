@@ -80,21 +80,7 @@
   position: relative;
 }
 
-.carousel-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  background: #23455f;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
-  z-index: 10;
-  border-radius: 50%;
-  line-height: 1;
-}
+
 #popular-prev { left: 0.25rem; }
 #popular-next { right: 0.25rem; }
 
@@ -134,7 +120,103 @@
   z-index: 1;
 }
 
-.card-overlay .info-icon {
-  pointer-events: auto;
+.category-carousel {
+  display: flex;
+  align-items: center;      
+  margin-top: 1rem;        
+}
+
+.category-carousel .carousel-nav {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: #fff;
   cursor: pointer;
+  flex-shrink: 0;          
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  height: 6rem;           
+  width: 2.5rem;            
+  margin: 0 0.5rem;       
+  border-radius: 0.25rem;
+}
+
+
+.category-carousel .popular-list {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  flex-grow: 1;             
+}
+
+.category-carousel .popular-list::-webkit-scrollbar {
+  display: none;
+}
+.category-carousel .popular-list {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;    
+}
+
+.category-carousel .pop-card {
+  flex: 0 0 auto;
+  margin-right: 1rem;       
+}
+
+/* Base button style */
+.add-fav {
+  position: relative;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+/* Hover effect */
+.add-fav:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #fad0c4 0%, #ff9a9e 100%);
+}
+
+/* Active/pressed effect */
+.add-fav:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}
+
+/* Star icon */
+.add-fav::before {
+  content: "★";
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+/* Already favorited state */
+.add-fav.favorited {
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+.add-fav.favorited::before {
+  content: "⭐";
+  animation: pulse 0.5s ease;
+}
+
+/* Pulse animation for feedback */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
 }

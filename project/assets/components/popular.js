@@ -2,23 +2,9 @@ import { translations } from "./lang.js";
 
 export function Results(selector, onCardClick) {
   let $results;
-  let $pagination;
-  let currentPage = 1;
-  let totalPages = 1;
-
   function init() {
     $results = $(selector);
-    $pagination = $('<div id="pagination"></div>').insertAfter($results);
 
-    // Pagination button clicks
-    $pagination.on('click', 'button', function() {
-      const page = $(this).data('page');
-      if (page) {
-        $(document).trigger('pager:changed', page);
-      }
-    });
-
-    // Info icon click
     $results.on('click', '.info-icon', function(e) {
       e.stopPropagation();
       const id = $(this).closest('.result-card').data('id');
@@ -44,21 +30,13 @@ export function Results(selector, onCardClick) {
           </div>
           <div class="card-details">
             <h3 class="title">${movie.title} (${(movie.release_date||'').slice(0,4)})</h3>
-            <button class="add-fav">${translations[window.currentLang]?.addFavorite || "Add to Favorites"}</button>
-            <button class="info-icon">${translations[window.currentLang]?.moreInfo || "More Info"}</button>
+            <button class="info-icon">${translations[window.currentLang].moreInfo || "More Info"}</button>
           </div>
         </div>
       `;
     }).join('');
 
     $results.html(html);
-
-    // Render pagination
-    let pagerHtml = '';
-    for (let i = 1; i <= totalPages; i++) {
-      pagerHtml += `<button data-page="${i}"${i === currentPage ? ' class="active"' : ''}>${i}</button>`;
-    }
-    $pagination.html(pagerHtml);
   }
 
   return { init, render };
