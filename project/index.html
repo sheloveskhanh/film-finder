@@ -78,27 +78,27 @@
 
   <div class="filters">
     <div class="filter-item">
-      <label for="year-from" data-i18n="filterYearRange">Year Range</label>
-      <input type="number" id="year-from" placeholder="From" min="1900" max="2099" data-i18n-placeholder="filterFrom" />
+      <label id="year-range-label" for="year-from">Year Range</label>
+      <input type="number" id="year-from" placeholder="From" min="1900" max="2099" />
       <span>–</span>
       <input type="number" id="year-to" placeholder="To" min="1900" max="2099" data-i18n-placeholder="filterTo" />
     </div>
 
     <div class="filter-item">
-      <label data-i18n="filterSortBy">Sort by</label>
-      <button type="button" id="sort-button" data-i18n="filterSortBy">Sort by ▾</button>
+      <label id="sort-by-label">Sort by</label>
+      <button type="button" id="sort-button">Sort by ▾</button>
       <ul id="sort-list" class="dropdown-menu"></ul>
     </div>
 
     <div class="filter-item">
-      <label data-i18n="filterCountry">Country</label>
-      <button type="button" id="country-button" data-i18n="filterCountry">Country ▾</button>
+      <label id="country-label">Country</label>
+      <button type="button" id="country-button">Country ▾</button>
       <ul id="country-list" class="dropdown-menu"></ul>
     </div>
 
     <div class="filter-item">
-      <label data-i18n="filterGenre">Genre</label>
-      <button type="button" id="genre-button-2" data-i18n="filterGenre">Genre ▾</button>
+      <label id="genre-label">Genre</label>
+      <button type="button" id="genre-button-2">Genre ▾</button>
       <ul id="genre-list-2" class="dropdown-menu"></ul>
     </div>
 
@@ -146,6 +146,7 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="module" src="assets/components/main.js"></script>
 
 
   <script type="module" src="assets/components/main.js"></script>

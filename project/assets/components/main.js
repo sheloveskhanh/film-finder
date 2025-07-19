@@ -181,7 +181,4 @@ $(function () {
     filterState.page = 1;
     reloadResults();
   });
-
-  $(".category-carousel").hide();
-  showOnlyCategory("topRated");
 });
