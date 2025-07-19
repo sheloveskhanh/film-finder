@@ -156,12 +156,7 @@ function applyTranslations(lang) {
     const key = $(this).data("i18n-placeholder");
     $(this).attr("placeholder", translations[lang][key] || "");
   });
-}
 
-function applyFilterTranslations(lang) {
-  // Example: update a button’s text that wasn’t covered by data-i18n
-  // If you have elements like: <button id="sort-button">Sort by ▾</button>
-  // you could do:
   $("#sort-button").text(translations[lang].filterSortBy);
   $("#country-button").text(translations[lang].filterCountry);
   $("#genre-button-2").text(translations[lang].filterGenre);
@@ -171,5 +166,4 @@ function applyFilterTranslations(lang) {
 export {
   translations,
   applyTranslations,
-  applyFilterTranslations,
 };

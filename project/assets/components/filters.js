@@ -1,4 +1,4 @@
-import { applyFilterTranslations, translations } from "./lang.js";
+import {  translations } from "./lang.js";
 
 export let filterState = {
   yearFrom: null,

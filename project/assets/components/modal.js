@@ -1,10 +1,11 @@
-
 import { translations } from "./lang.js";
 
+const FALLBACK_POSTER = 'assets/image/no-image.jpg';
+
 export const MovieModal = (function() {
-  const $modal     = $('#movie-modal');
+  const $modal = $('#movie-modal');
   const $container = $modal.find('.modal-content');
-  let lastData = null;  
+  let lastData = null;
 
   function stopVideo() {
     $container.find('iframe').each(function() {
@@ -16,6 +17,7 @@ export const MovieModal = (function() {
   function onClose() {
     stopVideo();
     $modal.hide();
+    document.body.style.overflow = ''; // Reset overflow
   }
 
   function onOutsideClick(e) {
@@ -45,125 +47,96 @@ export const MovieModal = (function() {
     } else if (trailerId) {
       return `
         <div class="modal-trailer" style="padding:1rem; text-align:center;">
-          <p>This trailer can’t be embedded here.
+          <p>This trailer can't be embedded here.
             <a href="https://youtu.be/${trailerId}" target="_blank" rel="noopener">
               Watch on YouTube
             </a>
           </p>
         </div>`;
-    } else {
-      return `
-        <div class="modal-trailer" style="padding:1rem; text-align:center;">
-          <p>No trailer found.</p>
-        </div>`;
     }
+    return `
+      <div class="modal-trailer" style="padding:1rem; text-align:center;">
+        <p>No trailer found.</p>
+      </div>`;
   }
 
   function renderContents(movie, trailerId, embeddable) {
     const t = translations[window.currentLang] || {};
-
-    const posterSrc = movie.Poster && movie.Poster !== 'N/A'
-      ? movie.Poster
-      : 'assets/image/no-image.jpg';
+    
+    const isOMDB = 'Title' in movie;
+    const title = isOMDB ? movie.Title : movie.title;
+    const posterSrc = isOMDB 
+      ? (movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : FALLBACK_POSTER)
+      : (movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : FALLBACK_POSTER);
 
     const trailerSection = buildTrailerSection(trailerId, embeddable);
 
     const html = `
       <div class="modal-header">
         <span class="close">&times;</span>
+        <h2>${title}</h2>
       </div>
-      <div class="modal-body" style="display:flex; gap:1rem;">
+      <div class="modal-body" style="display:flex; gap:1rem; max-height:60vh; overflow-y:auto;">
         <div class="modal-poster" style="flex-shrink:0;">
           <img
             src="${posterSrc}"
-            alt="${movie.Title} Poster"
-            onerror="this.onerror=null; this.src='assets/image/no-image.jpg';"
-            style="width:160px; object-fit:cover;"
+            alt="${title} Poster"
+            onerror="this.onerror=null;this.src= '${FALLBACK_POSTER}';"
+            style="width:100%; max-width:342px; object-fit:cover;"
           >
         </div>
         <div class="details" style="flex-grow:1;">
-          <h2>${movie.Title}</h2>
-          <p><strong>${t.genreLabel || 'Genre'}:</strong> ${movie.Genre}</p>
-          <p><strong>${t.actorsLabel || 'Actors'}:</strong> ${movie.Actors}</p>
-          <p><strong>${t.releaseDateLabel || 'Release Date'}:</strong> ${movie.Released}</p>
-          <p><strong>${t.imdbRatingLabel || 'IMDb Rating'}:</strong> ${movie.imdbRating}</p>
-          <p><strong>${t.descriptionLabel || 'Description'}:</strong> ${movie.Plot}</p>
+          ${isOMDB ? `
+            <p><strong>${t.genreLabel || 'Genre'}:</strong> ${movie.Genre || 'N/A'}</p>
+            <p><strong>${t.actorsLabel || 'Actors'}:</strong> ${movie.Actors || 'N/A'}</p>
+            <p><strong>${t.releaseDateLabel || 'Released'}:</strong> ${movie.Released || 'N/A'}</p>
+            <p><strong>${t.imdbRatingLabel || 'Rating'}:</strong> ${movie.imdbRating || 'N/A'}</p>
+            <p><strong>${t.descriptionLabel || 'Plot'}:</strong> ${movie.Plot || 'N/A'}</p>
+          ` : `
+            <p><strong>${t.genreLabel || 'Genre'}:</strong> ${movie.genres?.map(g => g.name).join(', ') || 'N/A'}</p>
+            <p><strong>${t.releaseDateLabel || 'Released'}:</strong> ${movie.release_date || 'N/A'}</p>
+            <p><strong>${t.imdbRatingLabel || 'Rating'}:</strong> ${movie.vote_average || 'N/A'}</p>
+            <p><strong>${t.descriptionLabel || 'Overview'}:</strong> ${movie.overview || 'N/A'}</p>
+          `}
         </div>
       </div>
       ${trailerSection}
     `;
+    
     $container.html(html);
     initHandlers();
+    document.body.style.overflow = 'hidden'; 
     $modal.show();
   }
 
   function showLoading() {
     const t = translations[window.currentLang] || {};
-    const loadingText = t.loadingText || 'Loading movie details…';
-
-    const html = `
+    $container.html(`
       <div class="modal-header">
         <span class="close">&times;</span>
       </div>
       <div class="modal-body" style="text-align:center; padding:2rem;">
-        <p>${loadingText}</p>
+        <div class="spinner"></div>
+        <p>${t.loadingText || 'Loading...'}</p>
       </div>
-    `;
-    $container.html(html);
+    `);
     initHandlers();
     $modal.show();
   }
 
   function showError(message) {
     const t = translations[window.currentLang] || {};
-    const closeLabel = t.closeLabel || 'Close';
-
-    const html = `
+    $container.html(`
       <div class="modal-header">
         <span class="close">&times;</span>
       </div>
       <div class="modal-body" style="text-align:center; padding:2rem;">
-        <p>${message}</p>
-        <button class="close" style="margin-top:1rem;">${closeLabel}</button>
+        <p style="color:red;">${message}</p>
+        <button class="close-btn" style="margin-top:1rem; padding:8px 16px;">
+          ${t.closeLabel || 'Close'}
+        </button>
       </div>
-    `;
-    $container.html(html);
-    initHandlers();
-    $modal.show();
-  }
-
-  function showTMDBOnly(detail) {
-    const t = translations[window.currentLang] || {};
-    const posterSrc = detail.poster_path
-      ? `https://image.tmdb.org/t/p/w342${detail.poster_path}`
-      : "assets/image/no-image.jpg";
-
-    const html = `
-      <div class="modal-header">
-        <span class="close">&times;</span>
-      </div>
-      <div class="modal-body" style="display:flex; gap:1rem;">
-        <div class="modal-poster" style="flex-shrink:0;">
-          <img
-            src="${posterSrc}"
-            alt="${detail.title} Poster"
-            onerror="this.onerror=null;this.src='assets/image/no-image.jpg';"
-            style="width:160px; object-fit:cover;"
-          >
-        </div>
-        <div class="details" style="flex-grow:1;">
-          <h2>${detail.title}</h2>
-          <p><strong>${t.genreLabel   || 'Genre'}:</strong> ${detail.genres.map(g => g.name).join(", ")}</p>
-          <p><strong>${t.releaseDateLabel || 'Release Date'}:</strong> ${detail.release_date}</p>
-          <p><strong>${t.imdbRatingLabel || 'TMDB Rating'}:</strong> ${detail.vote_average}</p>
-          <p><strong>${t.descriptionLabel  || 'Overview'}:</strong> ${detail.overview}</p>
-        </div>
-      </div>
-      <div class="modal-trailer" style="padding:1rem; text-align:center;">
-        <p>${t.noTrailerText || "Trailer not available."}</p>
-      </div>
-    `;
-    $container.html(html);
+    `);
     initHandlers();
     $modal.show();
   }
@@ -174,19 +147,15 @@ export const MovieModal = (function() {
     },
     showLoading,
     showError,
-    show(movie, trailerId, embeddable) {
+    show(movie, trailerId = null, embeddable = false) {
       lastData = { movie, trailerId, embeddable };
       renderContents(movie, trailerId, embeddable);
     },
     showTMDBOnly(detail) {
-      lastData = { movie: detail, trailerId: null, embeddable: false };
-      showTMDBOnly(detail);
+      this.show(detail);
     },
     rerender() {
-      if (lastData) {
-        const { movie, trailerId, embeddable } = lastData;
-        renderContents(movie, trailerId, embeddable);
-      }
+      if (lastData) this.show(lastData.movie, lastData.trailerId, lastData.embeddable);
     }
   };
 })();

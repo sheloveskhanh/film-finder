@@ -24,16 +24,21 @@
       <h1 data-i18n="title">Movie App</h1>
     </div>
     <div class="nav-right">
-      <select id="language-switch">
-        <option value="en">English</option>
-        <option value="es">Español</option>
-        <option value="fr">French</option>
-        <option value="de">Deutsch</option>
-      </select>
+      <div class="language-switcher">
+        <button class="language-trigger" aria-haspopup="true" aria-expanded="false">
+          <span class="language-icon">🌐</span>
+          <span class="current-language">English</span>
+        </button>
+        <ul class="language-dropdown" role="menu">
+          <li role="none"><button role="menuitem" data-lang="en">English</button></li>
+          <li role="none"><button role="menuitem" data-lang="es">Español</button></li>
+          <li role="none"><button role="menuitem" data-lang="fr">Français</button></li>
+          <li role="none"><button role="menuitem" data-lang="de">Deutsch</button></li>
+        </ul>
+      </div>
 
       <div class="favorites-wrapper">
         <button id="favorites-button" class="btn-favorites">
-          <span class="icon">★</span>
           <span class="text">Favorites</span>
           <span id="favorites-count" class="count">0</span>
         </button>
@@ -73,33 +78,33 @@
 
   <div class="filters">
     <div class="filter-item">
-      <label for="year-from">Year Range</label>
-      <input type="number" id="year-from" placeholder="From" min="1900" max="2099" />
+      <label for="year-from" data-i18n="filterYearRange">Year Range</label>
+      <input type="number" id="year-from" placeholder="From" min="1900" max="2099" data-i18n-placeholder="filterFrom" />
       <span>–</span>
-      <input type="number" id="year-to" placeholder="To" min="1900" max="2099" />
+      <input type="number" id="year-to" placeholder="To" min="1900" max="2099" data-i18n-placeholder="filterTo" />
     </div>
 
     <div class="filter-item">
-      <label>Sort by</label>
-      <button type="button" id="sort-button">Sort by ▾</button>
+      <label data-i18n="filterSortBy">Sort by</label>
+      <button type="button" id="sort-button" data-i18n="filterSortBy">Sort by ▾</button>
       <ul id="sort-list" class="dropdown-menu"></ul>
     </div>
 
     <div class="filter-item">
-      <label>Country</label>
-      <button type="button" id="country-button">Country ▾</button>
+      <label data-i18n="filterCountry">Country</label>
+      <button type="button" id="country-button" data-i18n="filterCountry">Country ▾</button>
       <ul id="country-list" class="dropdown-menu"></ul>
     </div>
 
     <div class="filter-item">
-      <label>Genre</label>
-      <button type="button" id="genre-button-2">Genre ▾</button>
+      <label data-i18n="filterGenre">Genre</label>
+      <button type="button" id="genre-button-2" data-i18n="filterGenre">Genre ▾</button>
       <ul id="genre-list-2" class="dropdown-menu"></ul>
     </div>
 
     <div class="filter-item">
       <label>&nbsp;</label>
-      <button type="button" id="clear-filters">Clear Filters</button>
+      <button type="button" id="clear-filters" data-i18n="filterClear">Clear Filters</button>
     </div>
   </div>
 

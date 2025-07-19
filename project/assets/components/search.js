@@ -3,7 +3,7 @@ import {
   discoverMovies,
   getMovieDetails,
 } from "./tmdbServices.js";
-import { renderResults, renderPager } from "./uiHelpers.js";
+import { renderPager } from "./uiHelpers.js";
 import { MovieModal } from "./modal.js";
 import { Favorites } from "./favorites.js";
 import { filterState, genreRev, countryMap } from "./filters.js";
@@ -13,12 +13,30 @@ const OMDB_API_KEY = "375878b3";
 const YT_API_KEY = "AIzaSyDnDJkjOBT2Ruj9jW88J9BIZHJuwnMlI3c";
 const $searchInput = $("#search-input");
 
-let lastMovies = []; // stores the full list of movies for the current page
+let lastMovies = [];
 const movieCache = {};
 const trailerCache = {};
 
+// Notification helper function
+function showNotification(message, isError = false) {
+  const notification = document.createElement("div");
+  notification.className = `notification ${isError ? "error" : ""}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.classList.add("show");
+  }, 10);
+
+  setTimeout(() => {
+    notification.classList.remove("show");
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 3000);
+}
+
 export function initSearch() {
-  // Search button
   $("#search-button").on("click", () => {
     filterState.page = 1;
     reloadResults();
@@ -26,11 +44,10 @@ export function initSearch() {
 
   $("#per-page-selector").on("change", function () {
     filterState.perPage = parseInt($(this).val());
-    filterState.page = 1; // Reset to first page
+    filterState.page = 1;
     reloadResults();
   });
 
-  // Enter key in input
   $searchInput.on("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -39,7 +56,6 @@ export function initSearch() {
     }
   });
 
-  // Clear results when input is emptied
   $searchInput.on("input", () => {
     if (!$searchInput.val().trim()) {
       $("#results, #pagination").empty();
@@ -47,7 +63,6 @@ export function initSearch() {
     }
   });
 
-  // Pagination clicks
   $("#pagination").on("click", "button", function () {
     if ($(this).is(":disabled")) return;
     const p = $(this).data("page");
@@ -57,42 +72,66 @@ export function initSearch() {
     }
   });
 
-  // Add to favorites handler
-  $("#results").on("click", ".add-fav", async function (e) {
+  // Favorites button handler
+  // In initSearch(), replace the favorites button handler with:
+  $("#results").on("click", ".add-fav:not(.added)", async function (e) {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
 
-    const $card = $(this).closest(".result-card");
-    const tmdbId = $card.data("id");
+    const $button = $(this);
+    const tmdbId = $button.data("movie-id");
     const movie = lastMovies.find((m) => String(m.id) === String(tmdbId));
 
     if (!movie) {
-      console.error("Movie not found in lastMovies:", tmdbId);
-      alert("Unable to add to favorites right now. Please try again.");
+      showNotification("Movie not found in current results", true);
       return;
     }
 
     try {
+      // Ensure we have complete movie data
       if (!movie.poster_path || !movie.title) {
         const details = await getMovieDetails(tmdbId);
         Object.assign(movie, details);
       }
 
-      Favorites.add(movie);
-      alert("Added to your favorites! ⭐");
+      // Prepare the movie object in both formats
+      const movieToAdd = {
+        id: movie.id,
+        title: movie.title,
+        release_date: movie.release_date,
+        poster_path: movie.poster_path,
+        imdbID: movie.imdb_id,
+        // OMDB-style fields
+        Title: movie.title,
+        Year: movie.release_date?.slice(0, 4),
+        Poster: movie.poster_path
+          ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+          : "./assets/image/no-image.jpg",
+      };
+
+      const added = Favorites.add(movieToAdd);
+
+      if (added) {
+        $button.text("✓ Added").addClass("added").prop("disabled", true);
+        showNotification(`${movie.title} added to favorites!`);
+      } else {
+        showNotification(`${movie.title} is already in your favorites!`, true);
+        $button.text("✓ Added").addClass("added").prop("disabled", true);
+      }
     } catch (error) {
-      console.error("Error adding to favorites:", error);
-      alert("Unable to add to favorites right now. Please try again.");
+      console.error("Error adding favorite:", error);
+      showNotification("Failed to add to favorites", true);
     }
   });
 
-  // Movie card click handler
-  $("#results").on("click", ".result-card", async function (e) {
+  $("#results").on("click", ".result-card, .info-icon", async function (e) {
     if ($(e.target).closest(".add-fav").length > 0) return;
 
-    const tmdbId = $(this).data("id");
+    const $card = $(this).closest(".result-card");
+    const tmdbId = $card.data("id");
     let detail = movieCache[tmdbId];
+
     if (!detail) {
       MovieModal.showLoading();
       try {
@@ -106,10 +145,7 @@ export function initSearch() {
 
     const imdbID = detail.external_ids?.imdb_id;
     if (!imdbID) {
-      return (MovieModal.showTMDBOnly || MovieModal.showError).call(
-        MovieModal,
-        detail
-      );
+      return MovieModal.showTMDBOnly(detail);
     }
 
     MovieModal.showLoading();
@@ -123,30 +159,30 @@ export function initSearch() {
     }
   });
 
-  // ️⭐ NEW FAVORITES DROPDOWN FUNCTIONALITY ⭐️
-  // Initialize favorites dropdown
   Favorites.render();
 
-  // Favorites button click handler
+  // Favorite dropdown handlers
   $("#favorites-button").on("click", function (e) {
     e.stopPropagation();
-    $("#favorites-dropdown").toggle();
-    if ($("#favorites-dropdown").is(":visible")) {
-      Favorites.render(); // Refresh list when opening
+    const $dropdown = $("#favorites-dropdown");
+    const wasVisible = $dropdown.is(":visible");
+    $dropdown.toggle();
+    $("body").toggleClass("favorites-open", !wasVisible);
+    if (!wasVisible) Favorites.render();
+  });
+
+  $(document).on("click", function (e) {
+    if (!$(e.target).closest("#favorites-button, #favorites-dropdown").length) {
+      $("#favorites-dropdown").hide();
+      $("body").removeClass("favorites-open");
+      document.body.style.overflow = "";
     }
   });
 
-  // Close dropdown when clicking outside
-  $(document).on("click", function () {
-    $("#favorites-dropdown").hide();
-  });
-
-  // Prevent dropdown from closing when clicking inside it
   $("#favorites-dropdown").on("click", function (e) {
     e.stopPropagation();
   });
 
-  // Remove favorite handler
   $("#favorites-list").on("click", ".remove-fav", function (e) {
     e.stopPropagation();
     const movieId = $(this).closest("li").data("id");
@@ -154,7 +190,6 @@ export function initSearch() {
   });
 }
 
-// Rest of your existing functions remain exactly the same...
 export async function reloadResults() {
   const q = $searchInput.val().trim();
   const hasFilters = Boolean(
@@ -179,23 +214,27 @@ export async function reloadResults() {
         filterState.perPage
       );
       pageMovies = resp.movies;
-      totalPages = resp.totalPages;
+      totalPages = Math.min(Math.ceil(resp.totalPages), 500);
     } else if (q) {
       const resp = await searchMovies(q, filterState.page, filterState.perPage);
-      pageMovies = resp.movies.filter((m) =>
-        m.title.toLowerCase().includes(q.toLowerCase())
-      );
-      totalPages = resp.totalPages;
+      pageMovies = resp.movies;
+      totalPages = Math.min(Math.ceil(resp.totalPages), 500);
     }
 
     lastMovies = pageMovies;
-
     renderResults(pageMovies);
-    renderPager(filterState.page, totalPages);
+
+    // Only show pagination if there are multiple pages
+    if (totalPages > 1) {
+      renderPager(filterState.page, totalPages);
+    } else {
+      $("#pagination").empty();
+    }
+
     annotateTmdbDetails(pageMovies);
   } catch (err) {
-    console.error("Error during reloadResults():", err);
-    MovieModal.showError("Couldn't load results. Please try again.");
+    console.error("Search error:", err);
+    showNotification("Couldn't load results. Please try again.", true);
   }
 }
 
@@ -268,6 +307,57 @@ function applyFiltersToCard(tmdbId, detail) {
   }
 }
 
+function renderResults(movies) {
+  $("#results").empty();
+
+  if (!movies || movies.length === 0) {
+    $("#results").html('<div class="no-results">No movies found</div>');
+    return;
+  }
+
+  const favorites = Favorites.get(); // Changed from getAll()
+
+  const movieCards = movies.map((movie) => {
+    const releaseYear = movie.release_date?.substring(0, 4) || "N/A";
+    const posterPath = movie.poster_path
+      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+      : "./assets/image/no-image.jpg";
+
+    const isFavorited = favorites.some(
+      (fav) =>
+        (fav.id && fav.id === movie.id) ||
+        (fav.imdbID && fav.imdbID === movie.id)
+    );
+
+    return `
+      <div class="result-card" data-id="${movie.id}" data-year="${releaseYear}">
+        <img src="${posterPath}" 
+             alt="${movie.title}" 
+             class="movie-poster"
+             onerror="this.onerror=null;this.src='./assets/image/no-image.jpg'"
+             loading="lazy">
+        <div class="movie-info">
+          <h3 class="title">${movie.title}</h3>
+          <div class="details">
+            <span class="year">${releaseYear}</span>
+            <span class="rating">⭐ ${
+              movie.vote_average?.toFixed(1) || "N/A"
+            }</span>
+            <span class="info-icon">ⓘ</span>
+          </div>
+          <button class="add-fav ${isFavorited ? "added" : ""}" 
+                  data-movie-id="${movie.id}"
+                  ${isFavorited ? "disabled" : ""}>
+            ${isFavorited ? "✓ Added" : "+ Add to Favorites"}
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  $("#results").append(movieCards);
+}
+
 function fetchOMDB(imdbID) {
   return $.getJSON(OMDB_API_URL, {
     apikey: OMDB_API_KEY,
@@ -286,8 +376,10 @@ async function fetchYouTubeTrailer(title) {
     q: `${title} official trailer`,
     key: YT_API_KEY,
   });
+
   const vid = yt.items?.[0]?.id.videoId || null;
   let emb = false;
+
   if (vid) {
     const st = await $.getJSON("https://www.googleapis.com/youtube/v3/videos", {
       part: "status",
@@ -296,6 +388,7 @@ async function fetchYouTubeTrailer(title) {
     });
     emb = st.items?.[0]?.status.embeddable || false;
   }
+
   trailerCache[title] = { videoId: vid, embeddable: emb };
   return trailerCache[title];
 }

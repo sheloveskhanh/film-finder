@@ -2,18 +2,20 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 8px 15px;
+  padding: 4px 12px;
   border-radius: 20px;
   display: flex;
   align-items: center;
   gap: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
+  height: 32px;
+  font-size: 0.9em;
 }
 
 #favorites-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 #favorites-count {
@@ -29,21 +31,182 @@
   margin-left: 5px;
 }
 
-.remove-fav {
-  background: #ff6b6b;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
+.favorites-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+#favorites-dropdown {
+  display: none;
+  position: fixed;
+  /* Changed from absolute to fixed */
+  top: 60px;
+  /* Distance from top of viewport */
+  right: 20px;
+  /* Distance from right of viewport */
+  background: #2d2d2d;
+  width: 400px;
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  padding: 15px;
+  /* Add these to prevent scrolling issues */
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.favorites-open {
+  overflow: hidden;
+}
+
+#favorites-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+#favorites-list li {
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  background: rgba(155, 133, 133, 0.05);
+  border-radius: 6px;
+  padding: 10px;
   transition: all 0.2s ease;
 }
 
+#favorites-list li:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.favorite-poster {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.favorite-info {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.favorite-title {
+  display: block;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.favorite-year {
+  display: block;
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+#favorites-list .empty-message {
+  grid-column: 1;
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+#favorites-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+#favorites-dropdown::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+#favorites-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.movie-item {
+  display: flex;
+  gap: 15px;
+  padding: 10px;
+  align-items: flex-start;
+}
+
+.movie-poster {
+  width: 60px;
+  height: 90px;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.movie-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie-info {
+  flex: 1;
+}
+
+.movie-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.movie-year {
+  color: #f2eded;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
+
+.remove-fav {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #f2f0f0;
+  font-size: 0.8em;
+  transition: all 0.2s;
+}
+
 .remove-fav:hover {
-  background: #ff5252;
-  transform: scale(1.1);
+  color: #ff4444;
+  background: rgba(255, 0, 0, 0.1);
+  background: none;
+}
+
+.btn-favorites:hover {
+  background: #f5f5f5;
+}
+
+body.favorites-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }

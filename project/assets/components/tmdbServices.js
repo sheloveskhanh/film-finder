@@ -1,10 +1,10 @@
 // Constants
 const TMDB_API_URL = "https://api.themoviedb.org/3";
-const TMDB_API_KEY = "36b0465246018e127b54bfa7d47d965c"; // Should be moved to environment variables
+const TMDB_API_KEY = "36b0465246018e127b54bfa7d47d965c"; 
 const PAGES_PER_UI_PAGE = 3;
 const DEFAULT_LANGUAGE = "en-US";
 const MAX_RETRIES = 2;
-const RETRY_DELAY = 1000; // 1 second
+const RETRY_DELAY = 1000; 
 
 // Endpoints
 const endpoints = {

@@ -156,18 +156,6 @@
   cursor: pointer;
 }
 
-#pagination button.active {
-  background: #007bff;
-  border-color: #007bff;
-  color: #fff;
-  cursor: default;
-}
-
-#pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 #pagination:empty {
   display: none;
 }
@@ -178,4 +166,65 @@
   padding: 0 8px;
   font-size: 16px;
   color: #777;
+}
+
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1.1rem;
+  grid-column: 1 / -1;
+}
+
+.result-card .poster-container {
+  position: relative;
+  min-height: 200px;
+  background: #f5f5f5;
+}
+
+#pagination {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+#pagination button {
+  padding: 5px 10px;
+}
+
+#pagination button.active {
+  font-weight: bold;
+  background: #0d253f;
+  color: white;
+}
+
+#pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.result-card .add-fav {
+  background-color: #f5c518;
+  color: #000;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.result-card .add-fav:hover {
+  background-color: #e0b416;
+}
+
+.result-card .add-fav.added {
+  background-color: #4CAF50;
+  color: white;
+  cursor: default;
+}
+
+.result-card .add-fav:disabled {
+  opacity: 1; /* Keep it visible but non-interactive */
 }

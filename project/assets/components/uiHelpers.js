@@ -1,18 +1,15 @@
 import { translations } from "./lang.js";
 
-// Constants
-const PLACEHOLDER_IMAGE = "assets/image/no-image.jpg";
+const PLACEHOLDER_IMAGE = "./assets/image/no-image.jpg";
 const POSTER_BASE_URL = "https://image.tmdb.org/t/p";
 const currentLang = window.currentLang || 'en';
 
-// Image sizes for responsive loading (adjust as needed)
 const IMAGE_SIZES = {
   small: 'w185',
   medium: 'w342',
   large: 'w500'
 };
 
-// Skeleton loader HTML templates
 const SKELETON_TEMPLATES = {
   card: `
     <div class="result-card skeleton">
@@ -41,7 +38,7 @@ function getPosterUrl(path, size = 'medium') {
 function handleImageError(img) {
   img.onerror = null;
   img.src = PLACEHOLDER_IMAGE;
-  img.loading = 'eager'; // No need for lazy loading if we're using placeholder
+  img.loading = 'eager'; 
 }
 
 function renderSkeletons(container, count, type = 'card') {
@@ -87,10 +84,8 @@ export function renderPopularList(category, movieArray) {
   const container = containerMap[category];
   const count = Math.min(12, movieArray.length);
   
-  // Show skeletons while loading
   renderSkeletons(container, count, 'popularCard');
 
-  // Load real content after a brief delay (simulating network request)
   setTimeout(() => {
     const html = movieArray
       .slice(0, 12)
@@ -121,10 +116,9 @@ export function renderPopularList(category, movieArray) {
       .join("");
 
     $(container).html(html);
-  }, 300); // Simulate network delay
+  }, 300);
 }
 
-// Result cards
 export function buildResultCard(m) {
   const year = m.release_date?.slice(0, 4) || "";
   const imgUrl = m.poster_path 
@@ -155,12 +149,9 @@ export function buildResultCard(m) {
     </div>`;
 }
 
-// Results rendering
 export function renderResults(movieList) {
-  // Show skeletons while loading
   renderSkeletons('#results', movieList.length);
   
-  // Load real content after a brief delay
   setTimeout(() => {
     const fragment = document.createDocumentFragment();
     
@@ -220,42 +211,45 @@ export function renderFavoritesDropdown(favs = []) {
     const $list = $("#favorites-list");
     
     if (!favs.length) {
-      $list.html(`<li>${translations[currentLang].noFavorites}</li>`);
+      $list.html(`<li class="favorite-empty">${translations[currentLang].noFavorites}</li>`);
       return;
     }
 
     const fragment = document.createDocumentFragment();
     
     favs.forEach(movie => {
-      // Skip invalid entries
       if (!movie || (!movie.imdbID && !movie.id)) return;
       
       const li = document.createElement('li');
+      li.className = 'favorite-item';
       li.dataset.id = movie.imdbID || movie.id;
       
-      // Use the standardized properties
       li.innerHTML = `
-        <img src="${movie.Poster || PLACEHOLDER_IMAGE}" 
-             alt="${movie.Title}" 
-             loading="lazy"
-             onerror="handleImageError(this)">
-        <span>${movie.Title}${movie.Year ? ` (${movie.Year})` : ''}</span>
-        <button class="remove-fav" aria-label="Remove favorite">&times;</button>
+        <div class="movie-item">
+          <div class="movie-poster">
+            <img src="${movie.Poster || PLACEHOLDER_IMAGE}" 
+                 alt="${movie.Title}" 
+                 loading="lazy"
+                 onerror="this.src=  '${PLACEHOLDER_IMAGE}';">
+          </div>
+          <div class="movie-info">
+            <div class="movie-title">${movie.Title}</div>
+            ${movie.Year ? `<div class="movie-year">${movie.Year}</div>` : ''}
+            <button class="remove-fav" aria-label="Remove">
+              ${translations[currentLang]?.remove || 'Remove'}
+            </button>
+          </div>
+        </div>
       `;
       
       fragment.appendChild(li);
     });
 
     $list.empty().append(fragment);
-    
-    // Update favorites count if the element exists
-    const $count = $("#favorites-count");
-    if ($count.length) {
-      $count.text(favs.length);
-    }
+    $("#favorites-count").text(favs.length);
     
   } catch (e) {
     console.error("Error rendering favorites:", e);
-    $("#favorites-list").html(`<li class="error">${translations[currentLang].favoritesError}</li>`);
+    $("#favorites-list").html(`<li class="favorite-error">${translations[currentLang].favoritesError}</li>`);
   }
 }
