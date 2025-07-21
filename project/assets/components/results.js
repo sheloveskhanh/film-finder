@@ -92,7 +92,7 @@ export function Results(selector, onCardClick) {
           <div class="card-details">
             <h3 class="title">${movie.title} ${year ? `(${year})` : ""}</h3>
             <button class="add-fav">${addFavLabel}</button>
-            <button class="info-icon">${infoLabel}</button>
+            <button class="info-icon">${infoLabel}ℹ</button>
           </div>
         </div>
       `;

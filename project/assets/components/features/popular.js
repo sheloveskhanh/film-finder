@@ -56,7 +56,6 @@ export function Results(selector, onCardClick) {
 
     $results.html(html);
 
-    // Render pagination (simple example)
     let pagerHtml = '';
     for (let i = 1; i <= totalPages; i++) {
       pagerHtml += `<button data-page="${i}"${i === currentPage ? ' class="active"' : ''}>${i}</button>`;

@@ -1,18 +1,17 @@
-import {  translations } from "./lang.js";
+import { translations } from "./lang.js";
 
 export let filterState = {
   yearFrom: null,
-  yearTo:   null,
-  sortBy:   null,
-  country:  null,
-  genres:   [],
-  page: 1, 
-  perPage:  20, 
+  yearTo: null,
+  sortBy: null,
+  country: null,
+  genres: [],
+  page: 1,
+  perPage: 20,
 };
 
-export let genreRev   = {};
+export let genreRev = {};
 export let countryMap = {};
-
 
 function buildSortMenu() {
   $("#sort-button").text(translations[window.currentLang].sortByLabel);
@@ -20,13 +19,21 @@ function buildSortMenu() {
   $("#sort-list").empty();
 
   const options = [
-    { value: "original_title.asc", label: translations[window.currentLang].sortTitleAZ },
-    { value: "vote_average.desc", label: translations[window.currentLang].sortHighestRated },
-    { value: "vote_average.asc", label: translations[window.currentLang].sortLowestRated },
+    {
+      value: "original_title.asc",
+      label: translations[window.currentLang].sortTitleAZ,
+    },
+    {
+      value: "vote_average.desc",
+      label: translations[window.currentLang].sortHighestRated,
+    },
+    {
+      value: "vote_average.asc",
+      label: translations[window.currentLang].sortLowestRated,
+    },
   ];
 
-  options.forEach(opt => {
- 
+  options.forEach((opt) => {
     const $li = $(`<li data-sort="${opt.value}">${opt.label}</li>`);
     $("#sort-list").append($li);
   });
@@ -41,36 +48,41 @@ export function initFilters(onFiltersChangedCallback) {
   $(document).on("click", closeAllDropdowns);
   $("#year-from, #year-to").on("input", () => {
     filterState.yearFrom = parseInt($("#year-from").val()) || null;
-    filterState.yearTo   = parseInt($("#year-to").val())   || null;
-    filterState.page     = 1;
+    filterState.yearTo = parseInt($("#year-to").val()) || null;
+    filterState.page = 1;
     onFiltersChangedCallback();
   });
 
-  $("#per-page-select").on("change", e => {
-    filterState.perPage = Number(e.target.value);
-    filterState.page    = 1;
-    onFiltersChangedCallback();
+  $("#per-page-select").on("change", function () {
+    filterState.perPage = Number(this.value);
+
+    filterState.page = 1;
+
+    if (typeof onFiltersChangedCallback === "function") {
+      onFiltersChangedCallback();
+    }
+
   });
-  
-  $("#sort-button").on("click", e => {
+
+  $("#sort-button").on("click", (e) => {
     e.stopPropagation();
     closeAllDropdowns();
     $("#sort-list").toggle();
   });
 
-  $("#sort-list").on("click", "li", function() {
+  $("#sort-list").on("click", "li", function () {
     filterState.sortBy = $(this).data("sort");
     $("#sort-button").text(`Sort: ${$(this).text()} ▾`);
     filterState.page = 1;
     onFiltersChangedCallback();
   });
 
-  $("#country-button").on("click", e => {
+  $("#country-button").on("click", (e) => {
     e.stopPropagation();
     closeAllDropdowns();
     $("#country-list").toggle();
   });
-  $("#country-list").on("click", "li", function() {
+  $("#country-list").on("click", "li", function () {
     $("#country-list li").removeClass("active");
     $(this).addClass("active");
     filterState.country = $(this).data("code");
@@ -79,18 +91,18 @@ export function initFilters(onFiltersChangedCallback) {
     onFiltersChangedCallback();
   });
 
-  $("#genre-button-2").on("click", e => {
+  $("#genre-button-2").on("click", (e) => {
     e.stopPropagation();
     closeAllDropdowns();
     $("#genre-list-2").toggle();
   });
-  $("#genre-list-2").on("click", "li", function() {
+  $("#genre-list-2").on("click", "li", function () {
     $(this).toggleClass("active");
     filterState.genres = $("#genre-list-2 li.active")
       .map((i, el) => $(el).data("id"))
       .get();
 
-    const names = filterState.genres.map(id => genreRev[id]);
+    const names = filterState.genres.map((id) => genreRev[id]);
     let label;
     if (names.length === 0) {
       label = "Genre ▾";
@@ -109,11 +121,11 @@ export function initFilters(onFiltersChangedCallback) {
   $("#clear-filters").on("click", () => {
     filterState = {
       yearFrom: null,
-      yearTo:   null,
-      sortBy:   null,
-      country:  null,
-      genres:   [],
-      page:     1,
+      yearTo: null,
+      sortBy: null,
+      country: null,
+      genres: [],
+      page: 1,
     };
     $("#year-from, #year-to").val("");
     $("#sort-button").text(translations[window.currentLang].sortByLabel);

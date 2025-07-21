@@ -1,4 +1,3 @@
-// Constants
 const TMDB_API_URL = "https://api.themoviedb.org/3";
 const TMDB_API_KEY = "36b0465246018e127b54bfa7d47d965c"; 
 const PAGES_PER_UI_PAGE = 3;
@@ -6,7 +5,6 @@ const DEFAULT_LANGUAGE = "en-US";
 const MAX_RETRIES = 2;
 const RETRY_DELAY = 1000; 
 
-// Endpoints
 const endpoints = {
   search: `${TMDB_API_URL}/search/movie`,
   discover: `${TMDB_API_URL}/discover/movie`,
@@ -20,7 +18,6 @@ const endpoints = {
   details: (tmdbId) => `${TMDB_API_URL}/movie/${tmdbId}`,
 };
 
-// Helper function with retry logic
 async function fetchWithRetry(url, params = {}, retries = MAX_RETRIES) {
   try {
     const queryString = new URLSearchParams({
@@ -43,7 +40,6 @@ async function fetchWithRetry(url, params = {}, retries = MAX_RETRIES) {
   }
 }
 
-// Base API function with caching
 const apiCache = new Map();
 async function getJSON(url, params = {}) {
   const cacheKey = `${url}?${new URLSearchParams(params).toString()}`;
@@ -62,7 +58,6 @@ async function getJSON(url, params = {}) {
   }
 }
 
-// Genre and country services
 export async function fetchGenres() {
   try {
     const resp = await getJSON(endpoints.genreList);
@@ -82,19 +77,15 @@ export async function fetchCountries() {
   }
 }
 
-// Search and discover with pagination
 async function fetchPaginatedResults(endpoint, params, uiPage = 1) {
-  // Get first page to determine total pages
   const firstPage = await getJSON(endpoint, { ...params, page: 1 });
   const totalTmdPages = firstPage.total_pages || 1;
   const totalUIPages = Math.ceil(totalTmdPages / PAGES_PER_UI_PAGE);
   const currentUi = Math.min(Math.max(uiPage, 1), totalUIPages);
 
-  // Calculate page range to fetch
   const startPage = (currentUi - 1) * PAGES_PER_UI_PAGE + 1;
   const endPage = Math.min(startPage + PAGES_PER_UI_PAGE - 1, totalTmdPages);
 
-  // Fetch pages in parallel
   const promises = [];
   for (let p = startPage; p <= endPage; p++) {
     promises.push(getJSON(endpoint, { ...params, page: p }));
@@ -110,15 +101,25 @@ async function fetchPaginatedResults(endpoint, params, uiPage = 1) {
   };
 }
 
-export async function searchMovies(query, uiPage = 1, perPage = 20) {
-  if (!query || typeof query !== 'string') {
-    throw new Error("Invalid search query");
-  }
+export async function searchMovies(query, page = 1, filterState = { perPage: 20 }) {
+  try {
+    const response = await $.getJSON(
+      `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}` +
+      `&query=${encodeURIComponent(query)}` +
+      `&page=${page}` +
+      `&language=en-US` +
+      `&include_adult=false`
+    );
 
-  return fetchPaginatedResults(endpoints.search, {
-    query: encodeURIComponent(query.trim()),
-    include_adult: false,
-  }, uiPage);
+    return {
+      movies: response.results.slice(0, filterState.perPage), 
+      totalPages: response.total_pages,
+      totalResults: response.total_results
+    };
+  } catch (err) {
+    console.error("TMDB search error:", err);
+    throw err;
+  }
 }
 
 export async function discoverMovies(filterState, uiPage = 1) {
@@ -131,10 +132,14 @@ export async function discoverMovies(filterState, uiPage = 1) {
     ...(filterState.country && { region: filterState.country }),
   };
 
-  return fetchPaginatedResults(endpoints.discover, baseParams, uiPage);
+  const data = await fetchPaginatedResults(endpoints.discover, baseParams, uiPage);
+  
+  return {
+    ...data,
+    movies: data.movies.slice(0, filterState.perPage || 20) 
+  };
 }
 
-// Movie details
 export async function getMovieDetails(tmdbId) {
   if (!tmdbId || isNaN(tmdbId)) {
     throw new Error("Invalid TMDB ID");
@@ -150,7 +155,6 @@ export async function getMovieDetails(tmdbId) {
   }
 }
 
-// Category fetchers
 export async function fetchTrending() {
   try {
     const resp = await getJSON(endpoints.trending);
@@ -183,14 +187,12 @@ export async function fetchCategory(category) {
   }
 }
 
-// Cache management
 export function clearCache() {
   apiCache.clear();
 }
 
-// Rate limiting helper
 let lastRequestTime = 0;
-const MIN_REQUEST_INTERVAL = 200; // 200ms between requests
+const MIN_REQUEST_INTERVAL = 200; 
 
 async function rateLimitedFetch(url, options) {
   const now = Date.now();

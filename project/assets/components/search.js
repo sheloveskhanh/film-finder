@@ -42,12 +42,6 @@ export function initSearch() {
     reloadResults();
   });
 
-  $("#per-page-selector").on("change", function () {
-    filterState.perPage = parseInt($(this).val());
-    filterState.page = 1;
-    reloadResults();
-  });
-
   $searchInput.on("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -73,7 +67,6 @@ export function initSearch() {
   });
 
   // Favorites button handler
-  // In initSearch(), replace the favorites button handler with:
   $("#results").on("click", ".add-fav:not(.added)", async function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -89,20 +82,17 @@ export function initSearch() {
     }
 
     try {
-      // Ensure we have complete movie data
       if (!movie.poster_path || !movie.title) {
         const details = await getMovieDetails(tmdbId);
         Object.assign(movie, details);
       }
 
-      // Prepare the movie object in both formats
       const movieToAdd = {
         id: movie.id,
         title: movie.title,
         release_date: movie.release_date,
         poster_path: movie.poster_path,
         imdbID: movie.imdb_id,
-        // OMDB-style fields
         Title: movie.title,
         Year: movie.release_date?.slice(0, 4),
         Poster: movie.poster_path
@@ -194,37 +184,40 @@ export async function reloadResults() {
   const q = $searchInput.val().trim();
   const hasFilters = Boolean(
     filterState.yearFrom ||
-      filterState.yearTo ||
-      filterState.sortBy ||
-      filterState.country ||
-      filterState.genres.length
+    filterState.yearTo ||
+    filterState.sortBy ||
+    filterState.country ||
+    filterState.genres.length
   );
 
   $("#popular-section").toggle(!q && !hasFilters);
   $("#results, #pagination").empty();
 
   try {
-    let pageMovies = [],
-      totalPages = 1;
+    let pageMovies = [], totalPages = 1;
 
     if (hasFilters) {
       const resp = await discoverMovies(
         filterState,
         filterState.page,
-        filterState.perPage
+        filterState.perPage // This is now being used
       );
       pageMovies = resp.movies;
-      totalPages = Math.min(Math.ceil(resp.totalPages), 500);
+      totalPages = Math.ceil(resp.totalPages); // Removed artificial limit
     } else if (q) {
-      const resp = await searchMovies(q, filterState.page, filterState.perPage);
+      const resp = await searchMovies(
+        q, 
+        filterState.page, 
+        filterState.perPage // This is now being used
+      );
       pageMovies = resp.movies;
-      totalPages = Math.min(Math.ceil(resp.totalPages), 500);
+      totalPages = Math.ceil(resp.totalPages); // Removed artificial limit
     }
 
     lastMovies = pageMovies;
     renderResults(pageMovies);
 
-    // Only show pagination if there are multiple pages
+    // Pagination controls
     if (totalPages > 1) {
       renderPager(filterState.page, totalPages);
     } else {
@@ -343,12 +336,11 @@ function renderResults(movies) {
             <span class="rating">⭐ ${
               movie.vote_average?.toFixed(1) || "N/A"
             }</span>
-            <span class="info-icon">ⓘ</span>
           </div>
           <button class="add-fav ${isFavorited ? "added" : ""}" 
                   data-movie-id="${movie.id}"
                   ${isFavorited ? "disabled" : ""}>
-            ${isFavorited ? "✓ Added" : "+ Add to Favorites"}
+            ${isFavorited ? "✓ Added" : "❤ Add to Favorites"}
           </button>
         </div>
       </div>

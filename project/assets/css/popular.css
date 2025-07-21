@@ -74,13 +74,6 @@
   padding: 0.5rem 0;
 }
 
-.pop-card {
-  flex: 0 0 120px;       
-  cursor: pointer;
-  position: relative;
-}
-
-
 #popular-prev { left: 0.25rem; }
 #popular-next { right: 0.25rem; }
 
@@ -164,57 +157,76 @@
   margin-right: 1rem;       
 }
 
-/* Base button style */
 .add-fav {
-  position: relative;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-  color: white;
+  background: #bab4b4;
+  color: #000;
   border: none;
-  border-radius: 20px;
-  padding: 8px 15px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  margin-top: 8px;
+  font-weight: bold;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: center;
+  margin-top: auto;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 
-/* Hover effect */
 .add-fav:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  background: linear-gradient(135deg, #fad0c4 0%, #ff9a9e 100%);
+  background: #a4a39e;
+
 }
 
-/* Active/pressed effect */
 .add-fav:active {
   transform: translateY(0);
   box-shadow: 0 2px 3px rgba(0,0,0,0.1);
 }
 
-/* Star icon */
 .add-fav::before {
-  content: "★";
   font-size: 16px;
   transition: all 0.3s ease;
 }
 
-/* Already favorited state */
 .add-fav.favorited {
-  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  background: linear-gradient(135deg, #12418d 0%, #c2e9fb 100%);
 }
 
-.add-fav.favorited::before {
-  content: "⭐";
-  animation: pulse 0.5s ease;
+.add-fav.added {
+  background: #4CAF50; 
+  color: #000 !important; 
+  cursor: default;
 }
 
-/* Pulse animation for feedback */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  background: #4CAF50;
+  color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification.error {
+  background: #f44336;
+}
+
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.3); }

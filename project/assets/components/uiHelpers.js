@@ -108,9 +108,6 @@ export function renderPopularList(category, movieArray) {
               "
               sizes="(max-width: 600px) 185px, 342px"
             >
-            <div class="card-overlay">
-              <button class="info-icon" aria-label="More info">ℹ️</button>
-            </div>
           </div>`;
       })
       .join("");
